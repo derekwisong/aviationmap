@@ -50,6 +50,11 @@ def get_latest_metar(stations):
         raise RuntimeError("Unable to retreive METAR")
 
 def get_flight_categories(stations):
+    """
+    Get flight categories (VFR, MVFR, IFR, LIFR) for a list of stations.
+    https://www.aviationweather.gov/metar/help?page=plot#fltcat
+    """
+
     metars = get_latest_metar(stations)
     categories = {station: v.get('category') for station,v in metars.items()}
     return categories
