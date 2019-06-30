@@ -1,0 +1,14 @@
+{
+    "stations":[
+        {"name": "KJFK", "led": 1},
+        {"name": "KLGA", "led": 2},
+        {"name": "KEWR", "led": 3},
+        {"name": "KHPN", "led": 4},
+        {"name": "KBOS", "led": 5},
+        {"name": "KATL", "led": 5},
+        {"name": "KLAX", "led": 6},
+        {"name": "KSFO", "led": 7},
+        {"name": "KMIA", "led": 8},
+        {"name": "KPDK", "led": 9}
+    ]
+}

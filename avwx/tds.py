@@ -6,9 +6,16 @@ the Text Data Server (TDS)
 """
 
 import requests
+import logging
 import xml.etree.ElementTree as ET
 
 TDS = 'https://www.aviationweather.gov/adds/dataserver_current/httpparam'
+
+def item_text(item):
+    try:
+        return item.text
+    except AttributeError:
+        return None
 
 def parse_xml_metar(xml_data):
     root = ET.fromstring(xml_data)
@@ -17,24 +24,26 @@ def parse_xml_metar(xml_data):
         id = metar.find('station_id').text
         stations[id] = {
             'id': id,
-            'time': metar.find('observation_time').text,
-            'latitude': metar.find('latitude').text,
-            'longitude': metar.find('longitude').text,
-            'temp': metar.find('temp_c'),
-            'dewpoint': metar.find('dewpoint_c').text,
-            'wind_dir': metar.find('wind_dir_degrees').text,
-            'wind_speed': metar.find('wind_speed_kt').text,
-            'visibility': metar.find('visibility_statute_mi').text,
-            'altimiter': metar.find('altim_in_hg').text,
-            'pressure': metar.find('sea_level_pressure_mb').text,
+            'time': item_text(metar.find('observation_time')),
+            'latitude': item_text(metar.find('latitude')),
+            'longitude': item_text(metar.find('longitude')),
+            'temp': item_text(metar.find('temp_c')),
+            'dewpoint': item_text(metar.find('dewpoint_c')),
+            'wind_dir': item_text(metar.find('wind_dir_degrees')),
+            'wind_speed': item_text(metar.find('wind_speed_kt')),
+            'visibility': item_text(metar.find('visibility_statute_mi')),
+            'altimiter': item_text(metar.find('altim_in_hg')),
+            'pressure': item_text(metar.find('sea_level_pressure_mb')),
             'sky': metar.find('sky_condition').attrib,
-            'category': metar.find('flight_category').text,
-            'elevation': metar.find('elevation_m').text
+            'category': item_text(metar.find('flight_category')),
+            'elevation': item_text(metar.find('elevation_m'))
         }
 
     return stations
 
 def get_latest_metar(stations):
+    logger = logging.getLogger(__name__)
+    logger.info("Requesting latest METAR data")
     opts = {'datasource': 'metars',
             'requestType': 'retrieve',
             'format': 'xml',
@@ -42,8 +51,8 @@ def get_latest_metar(stations):
             'mostRecentForEachStation': 'constraint',
             'hoursBeforeNow': '1.75'}
 
-    response = requests.get(TDS, params=opts)
-
+    response = requests.get(TDS, params=opts, timeout=20.0)
+    
     if response.status_code == 200:
         return parse_xml_metar(response.text)
     else:
