@@ -1,0 +1,147 @@
+- stations:
+  # Maine
+  - code: KPQI
+    name: Presque Isle International Airport
+    led: 1
+  - code: KBGR
+    name: Bangor International Airport
+    led: 2
+  - code: KPWM
+    name: Portland International Jetport
+    led: 3
+  # Vermont
+  - code: KBTV
+    name: Burlington International Airport
+    led: 4
+  # New Hampshire
+  - code: KLEB
+    name: Lebanon Municipal Airport
+    led: 5
+  - code: KMHT
+    name: Manchester-Boston Regional Airport
+    led: 6
+  - code: KPSM
+    name: Portsmouth International Airport at Pease
+    led: 7
+  # Massachusetts
+  - code: KBOS
+    name: Gen. Edward Lawrence Logan International Airport
+    led: 8
+  - code: KACK
+    name: Nantucket Memorial Airport
+    led: 9
+  - code: KMVY
+    name: Martha\'s Vineyard Airport
+    led: 10
+  # Rhode Island
+  - code: KPVD
+    name: Theodore Francis Green State Airport
+    led: 11
+  - code: KBID
+    name: Block Island State Airport
+    led: 12
+  # Connecticut
+  - code: KGON
+    name: Groton-New London Airport
+    led: 13
+  - code: KBDL
+    name: Bradley International Airport
+    led: 14
+  - code: KHFD
+    name: Hartford-Brainard Airport
+    led: 15
+  - code: KDXR
+    name: Danbury Municipal Airport
+    led: 16
+  # New York
+  - code: KISP
+    name: Long Island MacArthur Airport
+    led: 17
+  - code: KFRG
+    name: Republic Airport
+    led: 18
+  - code: KJFK
+    name: John F. Kennedy International Airport
+    led: 19
+  - code: KLGA
+    name: LaGuardia Airport
+    led: 20
+  - code: KHPN
+    name: Westchester County Airport
+    led: 21
+  - code: KSWF
+    name: Stewart International Airport
+    led: 22
+  - code: KALB
+    name: Albany International Airport
+    led: 23
+  - code: KOGS
+    name: Ogdensburg International Airport
+    led: 24
+  - code: KSYR
+    name: Syracuse Hancock International Airport
+    led: 25
+  - code: KROC
+    name: Greater Rochester International Airport
+    led: 26
+  - code: KBUF
+    name: Buffalo Niagra International Airport
+    led: 27
+  - code: KIAG
+    name: Niagra Falls International Airport
+    led: 28
+  # Pennsylvania
+  - code: KERI
+    name: Erie International Airport
+    led: 29
+  - code: KPIT
+    name: Pittsburgh International Airport
+    led: 30
+  - code: KUNV
+    name: University Park Airport
+    led: 31
+  - code: KMDT
+    name: Harrisburg International Airport
+    led: 32
+  - code: KAVP
+    name: Wilkes-Barre/Scranton International Airport
+    led: 33
+  - code: KPHL
+    name: Philadelphia International Airport
+    led: 34
+  # New Jersey
+  - code: KEWR
+    name: Newark Liberty International Airport
+    led: 35 
+  - code: KACY
+    name: Atlantic City International Airport
+    led: 36
+  # Delaware
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  
