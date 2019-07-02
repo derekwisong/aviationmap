@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import ledvfrmap.led as led
+from ledvfrmap.map import LedMap
 import logging
 import threading
 import time
@@ -8,20 +8,16 @@ import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-stop = threading.Event()
-monitor = led.StationMonitor(stop)
 
 logger.info("Reading configuration")
 with open('config.json') as config_file:
     data = json.load(config_file)
-    for station in data["stations"]:
-        s = led.StationLed(station["name"], station["led"])
-        monitor.add_station(s)
-
-monitor.start()
+    stations = data['stations']
+    map = LedMap(stations)
 
 try:
-    monitor.join()
+    while True:
+        time.sleep(1)
 except KeyboardInterrupt:
-    logger.info("Stopping monitor...")
-    stop.set()
+    logger.info("Stopping map...")
+    map.stop()
