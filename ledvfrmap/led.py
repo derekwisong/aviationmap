@@ -3,8 +3,7 @@
 import logging
 
 class StationLed:
-    def __init__(self, name, number):
-        self.name = name
+    def __init__(self, number):
         self.number = number
         self.color = (0, 0, 0)
 
@@ -15,11 +14,11 @@ class StationLed:
         logger = logging.getLogger(__name__)
         if self.color is None:
             # turn off the led
-            logger.info("Turned off {} ({})".format(self.name, self.number))
+            logger.info("Turned off LED {}".format(self.number))
         else:
             # Set the LED color
             pass
-            logger.info("Set {} ({}) color to {}".format(self.name, self.number, self.color))
+            logger.info("Set LED {} color to {}".format(self.number, self.color))
 
     def set_rgb(self, r, g, b):
         new_color = (r, g, b)

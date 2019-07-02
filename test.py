@@ -5,13 +5,14 @@ import logging
 import threading
 import time
 import json
+import yaml
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.info("Reading configuration")
-with open('config.json') as config_file:
-    data = json.load(config_file)
+with open('config.yml') as config_file:
+    data = yaml.load(config_file, Loader=yaml.Loader)
     stations = data['stations']
     map = LedMap(stations)
 
