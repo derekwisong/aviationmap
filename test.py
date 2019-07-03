@@ -14,18 +14,7 @@ logger = logging.getLogger(__name__)
 logger.info("Reading configuration")
 with open('config.yml') as config_file:
     config = yaml.load(config_file, Loader=yaml.Loader)
-    stations = config['stations']
-    num_leds = config['leds']
-
-    if config['controller'] == 'test':
-        from ledvfrmap.led import TestLEDController
-        controller = TestLEDController(num_leds)   
-    else:
-        from ledvfrmap.rpi import LEDController
-        controller = LEDController(num_leds, config['rpi']['clock_pin'],
-                                   config['rpi']['data_pin'])
-
-    map = LedMap(stations, controller)
+    map = LedMap(config)
 
 try:
     while True:

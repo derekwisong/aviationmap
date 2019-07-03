@@ -14,7 +14,7 @@ class TestLEDController:
     def set_rgb(self, pixel_number, r, g, b, show=True):
         logger = logging.getLogger(__name__)
         color = (r, g, b)
-        logger.info("Controller setting LED {} to {}".format(pixel_number, color))
+        logger.info("Test controller setting LED {} to {}".format(pixel_number, color))
         self.pixels[pixel_number] = color
  
     def get_rgb(self, pixel_number):

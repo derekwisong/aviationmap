@@ -88,12 +88,23 @@ class Station(threading.Thread):
         self._stopped.set()
 
 class LedMap:
-    def __init__(self, stations, led_controller):
-        self.stations = {}
+    def __init__(self, config):
+        self.num_leds = config['leds']
         self.metar_monitor = data.MetarMonitor()
-        self.led_controller = led_controller
+        self.stations = {}
 
-        for station in stations:
+        if config['controller'] == 'test':
+            from .led import TestLEDController
+            controller = TestLEDController(self.num_leds)   
+        else:
+            from .rpi import LEDController
+            controller = LEDController(self.num_leds,
+                                       config['rpi']['clock_pin'],
+                                       config['rpi']['data_pin'])
+
+        self.led_controller = controller
+
+        for station in config['stations']:
             code = station['code']
             name = station['name']
             num = station['led']
@@ -102,7 +113,7 @@ class LedMap:
                 continue
 
             self.metar_monitor.add_station(code)
-            station = Station(code, name, num, self.metar_monitor, led_controller)
+            station = Station(code, name, num, self.metar_monitor, controller)
             station.start()
             self.stations[code] = station
         
