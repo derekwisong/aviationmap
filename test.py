@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from ledvfrmap.map import LedMap
+
 import logging
 import threading
 import time
@@ -12,9 +13,19 @@ logger = logging.getLogger(__name__)
 
 logger.info("Reading configuration")
 with open('config.yml') as config_file:
-    data = yaml.load(config_file, Loader=yaml.Loader)
-    stations = data['stations']
-    map = LedMap(stations)
+    config = yaml.load(config_file, Loader=yaml.Loader)
+    stations = config['stations']
+    num_leds = config['leds']
+
+    if config['controller'] == 'test':
+        from ledvfrmap.led import TestLEDController
+        controller = TestLEDController(num_leds)   
+    else:
+        from ledvfrmap.rpi import LEDController
+        controller = LEDController(num_leds, config['rpi']['clock_pin'],
+                                   config['rpi']['data_pin'])
+
+    map = LedMap(stations, controller)
 
 try:
     while True:

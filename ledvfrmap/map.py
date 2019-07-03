@@ -56,11 +56,11 @@ pickers = {'category': CategoryColorPicker(),
            'temp': TemperatureColorPicker(-10, 48, steps=30)}
 
 class Station(threading.Thread):
-    def __init__(self, code, name, led_number, metar_monitor):
+    def __init__(self, code, name, led_number, metar_monitor, led_controller):
         threading.Thread.__init__(self)
         self.metar_monitor = metar_monitor
 
-        self.led = StationLed(led_number)
+        self.led = StationLed(led_number, led_controller)
         self.code = code
         self.name = name
         self.number = led_number
@@ -88,9 +88,10 @@ class Station(threading.Thread):
         self._stopped.set()
 
 class LedMap:
-    def __init__(self, stations):
+    def __init__(self, stations, led_controller):
         self.stations = {}
         self.metar_monitor = data.MetarMonitor()
+        self.led_controller = led_controller
 
         for station in stations:
             code = station['code']
@@ -101,7 +102,7 @@ class LedMap:
                 continue
 
             self.metar_monitor.add_station(code)
-            station = Station(code, name, num, self.metar_monitor)
+            station = Station(code, name, num, self.metar_monitor, led_controller)
             station.start()
             self.stations[code] = station
         

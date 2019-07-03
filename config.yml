@@ -1,3 +1,8 @@
+controller: "test"
+leds: 37
+rpi:
+  clock_pin: 18
+  data_pin: 23
 stations:
   # Maine
   - code: KPQI

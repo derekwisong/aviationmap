@@ -2,10 +2,29 @@
 
 import logging
 
+class TestLEDController:
+    def __init__(self, pixel_count):
+        self.pixels = {i: (0, 0, 0) for i in range(pixel_count)}
+        self.pixel_count = pixel_count
+
+    def all_off(self):
+        for i in range(self.pixel_count):
+            self.set_rgb(i, 0, 0, 0) 
+    
+    def set_rgb(self, pixel_number, r, g, b, show=True):
+        logger = logging.getLogger(__name__)
+        color = (r, g, b)
+        logger.info("Controller setting LED {} to {}".format(pixel_number, color))
+        self.pixels[pixel_number] = color
+ 
+    def get_rgb(self, pixel_number):
+        return self.pixels[pixel_number]
+
 class StationLed:
-    def __init__(self, number):
+    def __init__(self, number, controller):
         self.number = number
         self.color = (0, 0, 0)
+        self.controller = controller
 
     def apply_color(self):
         """
@@ -17,7 +36,7 @@ class StationLed:
             logger.info("Turned off LED {}".format(self.number))
         else:
             # Set the LED color
-            pass
+            self.controller.set_rgb(self.number, *self.color)
             logger.info("Set LED {} color to {}".format(self.number, self.color))
 
     def set_rgb(self, r, g, b):
