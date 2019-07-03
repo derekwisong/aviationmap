@@ -1,1 +1,3 @@
-adafruit-ws2801
+#adafruit-ws2801
+requests
+pyyaml

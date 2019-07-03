@@ -17,6 +17,16 @@ def item_text(item):
     except AttributeError:
         return None
 
+def item_float(item):
+    try:
+        return float(item.text)
+    except AttributeError:
+        return None
+    except ValueError:
+        return None
+    except TypeError:
+        return None
+
 def parse_xml_metar(xml_data):
     root = ET.fromstring(xml_data)
     stations = {}
@@ -27,16 +37,16 @@ def parse_xml_metar(xml_data):
             'time': item_text(metar.find('observation_time')),
             'latitude': item_text(metar.find('latitude')),
             'longitude': item_text(metar.find('longitude')),
-            'temp': item_text(metar.find('temp_c')),
-            'dewpoint': item_text(metar.find('dewpoint_c')),
-            'wind_dir': item_text(metar.find('wind_dir_degrees')),
-            'wind_speed': item_text(metar.find('wind_speed_kt')),
-            'visibility': item_text(metar.find('visibility_statute_mi')),
-            'altimiter': item_text(metar.find('altim_in_hg')),
-            'pressure': item_text(metar.find('sea_level_pressure_mb')),
+            'temp': item_float(metar.find('temp_c')),
+            'dewpoint': item_float(metar.find('dewpoint_c')),
+            'wind_dir': item_float(metar.find('wind_dir_degrees')),
+            'wind_speed': item_float(metar.find('wind_speed_kt')),
+            'visibility': item_float(metar.find('visibility_statute_mi')),
+            'altimiter': item_float(metar.find('altim_in_hg')),
+            'pressure': item_float(metar.find('sea_level_pressure_mb')),
             'sky': metar.find('sky_condition').attrib,
             'category': item_text(metar.find('flight_category')),
-            'elevation': item_text(metar.find('elevation_m'))
+            'elevation': item_float(metar.find('elevation_m'))
         }
 
     return stations
