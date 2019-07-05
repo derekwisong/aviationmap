@@ -4,26 +4,42 @@ import threading
 import logging
 
 from . import data
-from .led import StationLed
 
-
-def linear_gradient(start_rgb, finish_rgb=(255, 255, 255), n=10):
+def linear_gradient(start_rgb=(0, 0, 0),
+                    finish_rgb=(255, 255, 255),
+                    n=10):
   gradient = [start_rgb]
 
   for t in range(1, n):
-    curr_vector = [
+    curr_rgb = [
       int(start_rgb[j] + (float(t)/(n - 1)) * (finish_rgb[j] - start_rgb[j]))
       for j in range(3)
     ]
-    gradient.append(curr_vector)
+    gradient.append(tuple(curr_rgb))
 
   return gradient
+
+def get_led_controller(config):
+    if config['controller'] == 'test':
+        from .led import TestLEDController
+        controller = TestLEDController(config['leds'])   
+    else:
+        from .rpi import LEDController
+        controller = LEDController(config['leds'],
+                                   config['rpi']['clock_pin'],
+                                   config['rpi']['data_pin'])
+        controller.start()
+
+    return controller
 
 class CategoryColorPicker:
     category_colors = {'VFR': (0, 255, 0),
                        'MVFR': (0, 0, 255),
                        'IFR': (255, 0, 0),
                        'LIFR': (255, 0, 255)}
+    
+    def color(self, value):
+        return self.category_colors[value]
 
     def pick_color(self, station):
         category = station.get_metar_value('category')
@@ -33,59 +49,62 @@ class CategoryColorPicker:
         except KeyError:
             return (0, 0, 0)
 
-class TemperatureColorPicker:
-    def __init__(self, min_temp, max_temp, steps=10, metar='temp'):
-        self.min_temp = min_temp
-        self.max_temp = max_temp
-        self.gradient = linear_gradient((0, 0, 255), (255, 0, 0), n=steps)
+class GradientColorPicker:
+    def __init__(self, min_value, max_value,
+                 gradient_start=(0, 0, 255),
+                 gradient_end=(255, 0, 0),
+                 steps=10,
+                 metar='temp'):
+        self.min_value = min_value
+        self.max_value = max_value
+        self.gradient = linear_gradient(gradient_start, gradient_end, n=steps)
         self.steps = steps
         self.metar = metar
 
-    def temp_to_color(self, temperature):
-        if temperature is None: return (0, 0, 0)
-        temperature = min(temperature, self.max_temp)
-        temperature = max(temperature, self.min_temp)
-        width = (self.max_temp - self.min_temp) / (self.steps - 1)
-        n = (temperature - self.min_temp) / width
+    def color(self, value):
+        if value is None: return (0, 0, 0)
+        value = min(value, self.max_value)
+        value = max(value, self.min_value)
+        width = (self.max_value - self.min_value) / (self.steps - 1)
+        n = (value - self.min_value) / width
         n = int(round(n))
         return self.gradient[n]
 
     def pick_color(self, station):
         temperature = station.get_metar_value(self.metar)
-        return self.temp_to_color(temperature)
+        return self.color(temperature)
 
 pickers = {'category': CategoryColorPicker(),
-           'temp': TemperatureColorPicker(-10, 48, steps=30, metar='temp'),
-           'temp2': TemperatureColorPicker(0, 40, steps=10, metar='temp'),
-           'wind_speed': TemperatureColorPicker(0, 20, steps=20, metar='wind_speed'),
-           'altimeter': TemperatureColorPicker(25, 35, steps=10, metar='altimeter')}
+           'temp': GradientColorPicker(-10, 48, steps=30, metar='temp'),
+           'temp2': GradientColorPicker(0, 40, steps=10, metar='temp'),
+           'wind_speed': GradientColorPicker(0, 20, steps=20, metar='wind_speed'),
+           'altimeter': GradientColorPicker(25, 35, steps=10, metar='altimeter')}
 
 class Station(threading.Thread):
-    def __init__(self, code, name, led_number, metar_monitor, led_controller,
+    def __init__(self, code, name, led_number, data, led_controller,
             color_picker='category'):
         threading.Thread.__init__(self)
-        self.metar_monitor = metar_monitor
-
-        self.led = StationLed(led_number, led_controller)
-        self.code = code
-        self.name = name
-        self.number = led_number
-
-        self.category = None
-
+        self.data = data
+        self.led_controller = led_controller
+        self.led = led_number
         self.set_color_picker(color_picker)
-
         self._stopped = threading.Event()
 
+        self.code = code
+        self.name = name
+        self.category = None
+        
     def set_color_picker(self, picker_name):
         self.color_picker = pickers[picker_name]
 
     def set_color(self, r, g, b):
-        if (r, g, b) != self.led.color:
-            self.led.set_rgb(r, g, b)
+        self.led_controller.set_rgb(self.led, *(r, g, b))
+    
+    def get_color(self):
+        return self.led_controller.get_rgb()
     
     def get_metar_value(self, item):
-        return self.metar_monitor.get_metar_value(self.code, item)
+        return self.data.get_metar_value(self.code, item)
 
     def run(self):
         logger = logging.getLogger(__name__)
@@ -107,20 +126,9 @@ class Station(threading.Thread):
 class LedMap:
     def __init__(self, config):
         self.num_leds = config['leds']
-        self.metar_monitor = data.MetarMonitor()
+        self.data = data.Data()
         self.stations = {}
-
-        if config['controller'] == 'test':
-            from .led import TestLEDController
-            controller = TestLEDController(self.num_leds)   
-        else:
-            from .rpi import LEDController
-            controller = LEDController(self.num_leds,
-                                       config['rpi']['clock_pin'],
-                                       config['rpi']['data_pin'])
-            controller.start()
-
-        self.led_controller = controller
+        self.led_controller = get_led_controller(config)
 
         for station in config['stations']:
             code = station['code']
@@ -130,21 +138,20 @@ class LedMap:
             if code is None or num is None:
                 continue
 
-            self.metar_monitor.add_station(code)
-            station = Station(code, name, num, self.metar_monitor, controller,
+            self.data.add_station(code)
+            station = Station(code, name, num, self.data, self.led_controller,
                     color_picker=config['color_picker'])
             station.start()
             self.stations[code] = station
         
-        self.metar_monitor.start()
-
+        self.data.start()
 
     def set_all_stations_color(self, r, g, b):
         for station in self.stations.values():
             station.set_color(r, g, b)
     
     def stop(self):
-        self.metar_monitor.stop()
+        self.data.stop()
         self.led_controller.stop()
 
         for station in self.stations.values():

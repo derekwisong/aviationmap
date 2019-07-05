@@ -5,6 +5,27 @@ import logging
 import datetime
 import avwx.tds
 
+class Data:
+    def __init__(self):
+        self.metar_monitor = MetarMonitor()
+        self.stations = set()
+    
+    def add_station(self, station):
+        self.stations.add(station)
+        self.metar_monitor.add_station(station)
+    
+    def get_metar(self, station):
+        return self.metar_monitor.get_metar(station)
+    
+    def get_metar_value(self, station, item):
+        return self.metar_monitor.get_metar_value(station, item)
+
+    def start(self):
+        self.metar_monitor.start()
+    
+    def stop(self):
+        self.metar_monitor.stop()
+
 class MetarMonitor(threading.Thread):
     def __init__(self, stations=None):
         threading.Thread.__init__(self)
@@ -33,6 +54,8 @@ class MetarMonitor(threading.Thread):
 
     def update(self):
         logger = logging.getLogger(__name__)
+        if len(self.stations) == 0:
+            return
 
         try:
             self.metar = avwx.tds.get_latest_metar(self.stations)
@@ -46,8 +69,5 @@ class MetarMonitor(threading.Thread):
         while not self.stopped.wait(60):
             self.update()
 
-    def category(self, station):
-        return self.get_metar_value(station, 'category')
-    
     def stop(self):
         self.stopped.set()

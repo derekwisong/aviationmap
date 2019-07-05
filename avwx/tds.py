@@ -38,7 +38,7 @@ def parse_xml_metar(xml_data):
     stations = {}
     for metar in root.iter('METAR'):
         id = metar.find('station_id').text
-        stations[id] = {
+        data = {
             'id': id,
             'time': item_text(metar.find('observation_time')),
             'latitude': item_text(metar.find('latitude')),
@@ -47,13 +47,25 @@ def parse_xml_metar(xml_data):
             'dewpoint': item_float(metar.find('dewpoint_c')),
             'wind_dir': item_float(metar.find('wind_dir_degrees')),
             'wind_speed': item_float(metar.find('wind_speed_kt')),
+            'wind_gust_speed': item_float(metar.find('wind_gust_kt')),
             'visibility': item_float(metar.find('visibility_statute_mi')),
-            'altimiter': item_float(metar.find('altim_in_hg')),
+            'altimeter': item_float(metar.find('altim_in_hg')),
             'pressure': item_float(metar.find('sea_level_pressure_mb')),
             'sky': item_attrib(metar.find('sky_condition')),
             'category': item_text(metar.find('flight_category')),
-            'elevation': item_float(metar.find('elevation_m'))
+            'elevation': item_float(metar.find('elevation_m')),
+            'xml': xml_data
         }
+        try:
+            data['ceiling'] = float(data['sky']['cloud_base_ft_agl'])
+        except KeyError:
+            data['ceiling'] = None
+        try:
+            data['sky_cover'] = data['sky']['sky_cover']
+        except KeyError:
+            data['sky_cover'] = None
+
+        stations[id] = data
 
     return stations
 
