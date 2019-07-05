@@ -1,3 +1,7 @@
-#adafruit-ws2801
+# necessary for raspberry pi communication with LEDs
+rpi.gpio
+adafruit-ws2801
+
+# python packages required
 requests
 pyyaml

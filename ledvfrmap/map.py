@@ -34,13 +34,15 @@ class CategoryColorPicker:
             return (0, 0, 0)
 
 class TemperatureColorPicker:
-    def __init__(self, min_temp, max_temp, steps=10):
+    def __init__(self, min_temp, max_temp, steps=10, metar='temp'):
         self.min_temp = min_temp
         self.max_temp = max_temp
         self.gradient = linear_gradient((0, 0, 255), (255, 0, 0), n=steps)
         self.steps = steps
+        self.metar = metar
 
     def temp_to_color(self, temperature):
+        if temperature is None: return (0, 0, 0)
         temperature = min(temperature, self.max_temp)
         temperature = max(temperature, self.min_temp)
         width = (self.max_temp - self.min_temp) / (self.steps - 1)
@@ -49,14 +51,18 @@ class TemperatureColorPicker:
         return self.gradient[n]
 
     def pick_color(self, station):
-        temperature = station.get_metar_value('temp')
+        temperature = station.get_metar_value(self.metar)
         return self.temp_to_color(temperature)
 
 pickers = {'category': CategoryColorPicker(),
-           'temp': TemperatureColorPicker(-10, 48, steps=30)}
+           'temp': TemperatureColorPicker(-10, 48, steps=30, metar='temp'),
+           'temp2': TemperatureColorPicker(0, 40, steps=10, metar='temp'),
+           'wind_speed': TemperatureColorPicker(0, 20, steps=20, metar='wind_speed'),
+           'altimeter': TemperatureColorPicker(25, 35, steps=10, metar='altimeter')}
 
 class Station(threading.Thread):
-    def __init__(self, code, name, led_number, metar_monitor, led_controller):
+    def __init__(self, code, name, led_number, metar_monitor, led_controller,
+            color_picker='category'):
         threading.Thread.__init__(self)
         self.metar_monitor = metar_monitor
 
@@ -65,7 +71,9 @@ class Station(threading.Thread):
         self.name = name
         self.number = led_number
 
-        self.set_color_picker('category')
+        self.category = None
+
+        self.set_color_picker(color_picker)
 
         self._stopped = threading.Event()
 
@@ -80,7 +88,16 @@ class Station(threading.Thread):
         return self.metar_monitor.get_metar_value(self.code, item)
 
     def run(self):
+        logger = logging.getLogger(__name__)
+        
         while not self._stopped.wait(1):
+            category = self.get_metar_value('category')
+            if category != self.category:
+                logger.info("{} category changed from {} to {}".format(self.code,
+                                                                       self.category,
+                                                                       category))
+                self.category = category
+          
             color = self.color_picker.pick_color(self)
             self.set_color(*color)
     
@@ -101,6 +118,7 @@ class LedMap:
             controller = LEDController(self.num_leds,
                                        config['rpi']['clock_pin'],
                                        config['rpi']['data_pin'])
+            controller.start()
 
         self.led_controller = controller
 
@@ -113,7 +131,8 @@ class LedMap:
                 continue
 
             self.metar_monitor.add_station(code)
-            station = Station(code, name, num, self.metar_monitor, controller)
+            station = Station(code, name, num, self.metar_monitor, controller,
+                    color_picker=config['color_picker'])
             station.start()
             self.stations[code] = station
         
@@ -126,6 +145,7 @@ class LedMap:
     
     def stop(self):
         self.metar_monitor.stop()
+        self.led_controller.stop()
 
         for station in self.stations.values():
             station.stop()

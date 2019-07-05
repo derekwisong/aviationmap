@@ -1,8 +1,9 @@
-controller: "test"
-leds: 37
+controller: "rpi"
+leds: 50
+color_picker: "category"
 rpi:
-  clock_pin: 18
-  data_pin: 23
+  data_pin: 10
+  clock_pin: 11
 stations:
   # Maine
   - code: KPQI
@@ -122,31 +123,28 @@ stations:
     name: Atlantic City International Airport
     led: 36
   # Delaware
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
-  - code:
-    name:
-    led:
+  - code: KLAX
+    name: Los Angeles International
+    led: 37
+  - code: KMIA
+    name: Miami International
+    led: 38
+  - code: KSEA
+    name: Seattle-Tacoma International
+    led: 39
+  - code: KLAS
+    name: Las Vegas McCarran
+    led: 40
+  - code: KATL
+    name: Hartsfield-Jackson International Airport
+    led: 41
+  - code: KSFO
+    name: San Francisco
+    led: 42
+  - code: KTYS
+    name: Tyson McGee
+    led: 43
+  - code: KMCO
+    name: Orlando International Airport
+    led: 44
   

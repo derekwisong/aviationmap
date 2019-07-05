@@ -27,6 +27,12 @@ def item_float(item):
     except TypeError:
         return None
 
+def item_attrib(item):
+    try:
+        return item.attrib
+    except AttributeError:
+        return None
+
 def parse_xml_metar(xml_data):
     root = ET.fromstring(xml_data)
     stations = {}
@@ -44,7 +50,7 @@ def parse_xml_metar(xml_data):
             'visibility': item_float(metar.find('visibility_statute_mi')),
             'altimiter': item_float(metar.find('altim_in_hg')),
             'pressure': item_float(metar.find('sea_level_pressure_mb')),
-            'sky': metar.find('sky_condition').attrib,
+            'sky': item_attrib(metar.find('sky_condition')),
             'category': item_text(metar.find('flight_category')),
             'elevation': item_float(metar.find('elevation_m'))
         }

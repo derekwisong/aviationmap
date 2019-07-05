@@ -38,7 +38,7 @@ class MetarMonitor(threading.Thread):
             self.metar = avwx.tds.get_latest_metar(self.stations)
             self.last_update = datetime.datetime.utcnow()
         except:
-            logger.error("Unable to update metar data")
+            logger.exception("Unable to update metar data")
 
     def run(self):
         self.update()
