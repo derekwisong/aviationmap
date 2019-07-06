@@ -123,28 +123,144 @@ stations:
     name: Atlantic City International Airport
     led: 36
   # Delaware
-  - code: KLAX
-    name: Los Angeles International
-    led: 37
-  - code: KMIA
-    name: Miami International
-    led: 38
+  # Maryland
+  - code: KADW
+    name: Andrews Air Force Base
+    led:
+  - code: KBWI
+    name: Baltimore-Washington International Airport
+    led:
+  # Washington D.C.
+  # Michigan
+  - code: KDTW
+    name: Detroit Metropolitan Wayne County Airport
+    led:
+  # Minnesota
+  - code: KMSP
+    name: Minneapolis-Saint Paul International Airport
+    led:
+  # Missouri
+  - code: KMCI
+    name: Kansas City International Airport
+    led: 
+  - code: KSTL
+    name: Lambert-St. Louis International Airport
+    led:
+  # North Carolina
+  - code: KCLT
+    name: Charlotte Douglas International Airport
+    led:
+  # Ohio
+  - code: KCLE
+    name: Cleveland Hopkins International Airport
+    led:
+  # Texas
+  - code: KDFW 
+    name: Dallas/Fort Worth International Airport
+    led: 
+  - code: KHOU
+    name: William P. Hobby Airport
+    led:
+  - code: KIAH
+    name: George Bush Intercontinental Airport
+    led:
+  # Utah
+  - code: KSLC
+    name: Salt Lake City International Airport
+    led:
+  # Virginia
+  - code: KDCA
+    name: Ronald Reagan Washington National Airport
+    led:
+  - code: KIAD
+    name: Washington Dulles International Airport
+    led: 
+  # Washington
   - code: KSEA
-    name: Seattle-Tacoma International
-    led: 39
+    name: Seattle-Tacoma International Airport
+    led: 
+  # Nevada
   - code: KLAS
     name: Las Vegas McCarran
-    led: 40
+    led: 
+  # Georgia
   - code: KATL
-    name: Hartsfield-Jackson International Airport
-    led: 41
-  - code: KSFO
-    name: San Francisco
-    led: 42
+    name: Hartsfield-Jackson Atlanta International Airport
+    led:
+  # Hawaii
+  - code: KHNL
+    name: Honolulu International Airport
+    led:
+  # Illinois
+  - code: KORD
+    name: O\'Hare International Airport
+    led:
+  # Kentucky:
+  - code: KCVG
+    name: Cincinnati/Northern Kentucky International Airport
+    led:
+  # Louisiana
+  - code: KMSY
+    name: Louis Armstrong New Orleans International Airport
+    led:
+  # Tennessee
   - code: KTYS
     name: Tyson McGee
-    led: 43
+    led:
+  - code: KMEM
+    name: Memphis International Airport
+    led:
+  # Florida
   - code: KMCO
     name: Orlando International Airport
-    led: 44
-  
+    led: 
+  - code: KMIA
+    name: Miami International
+    led: 
+  - code: KTPA
+    name: Tampa International Airport
+  # Arizona
+  - code: KPHX
+    name: Phoenix Sky Harbor International Airport
+    led: 45
+  # California
+  - code: KSFO
+    name: San Francisco
+    led: 
+  - code: KLAX
+    name: Los Angeles International
+    led: 
+  - code: KNKX
+    name: Marine Corps Air Station Miramar
+    led:
+  - code: KSAN
+    name: San Diego International Airport
+    led:
+  # Stub
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
+  - code:
+    name:
+    led:
