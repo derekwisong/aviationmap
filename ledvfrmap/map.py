@@ -19,6 +19,17 @@ def linear_gradient(start_rgb=(0, 0, 0),
 
   return gradient
 
+def multi_gradient(points, n=50):
+    section_length = int(n/(len(points) - 1))
+    gradient = []
+    for i in range(len(points) - 1):
+        l = section_length if i == 0 else section_length + 1
+        section = linear_gradient(points[i], points[i+1], n=l)
+        if i > 0: section = section[1:]
+        gradient.extend(section)
+
+    return gradient
+
 def get_led_controller(config):
     if config['controller'] == 'test':
         from .led import TestLEDController
@@ -53,12 +64,17 @@ class GradientColorPicker:
     def __init__(self, min_value, max_value,
                  gradient_start=(0, 0, 255),
                  gradient_end=(255, 0, 0),
+                 gradient=None,
                  steps=10,
                  metar='temp'):
         self.min_value = min_value
         self.max_value = max_value
-        self.gradient = linear_gradient(gradient_start, gradient_end, n=steps)
-        self.steps = steps
+        if gradient is not None:
+            self.gradient = gradient
+            self.steps = len(gradient)
+        else:
+            self.gradient = linear_gradient(gradient_start, gradient_end, n=steps)
+            self.steps = steps
         self.metar = metar
 
     def color(self, value):
@@ -75,7 +91,7 @@ class GradientColorPicker:
         return self.color(temperature)
 
 pickers = {'category': CategoryColorPicker(),
-           'temp': GradientColorPicker(-10, 48, steps=30, metar='temp'),
+           'temp': GradientColorPicker(-10, 48, gradient=multi_gradient(((0,0,255),(0,255,0),(255,0,0))), metar='temp'),
            'temp2': GradientColorPicker(0, 40, steps=10, metar='temp'),
            'wind_speed': GradientColorPicker(0, 20, steps=20, metar='wind_speed'),
            'altimeter': GradientColorPicker(25, 35, steps=10, metar='altimeter')}
@@ -125,18 +141,26 @@ class Station(threading.Thread):
 
 class LedMap:
     def __init__(self, config):
+        logger = logging.getLogger(__name__)
         self.num_leds = config['leds']
         self.data = data.Data()
         self.stations = {}
         self.led_controller = get_led_controller(config)
+        led_seen = set()
 
         for station in config['stations']:
             code = station['code']
             name = station['name']
+            if code is not None: logger.info(code)
             num = station['led']
 
             if code is None or num is None:
                 continue
+
+            if code in led_seen:
+              raise Exception("led {} already seen".format(code))
+            else:
+              led_seen.add(code)
 
             self.data.add_station(code)
             station = Station(code, name, num, self.data, self.led_controller,

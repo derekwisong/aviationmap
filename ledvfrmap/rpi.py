@@ -29,7 +29,7 @@ class LEDController(threading.Thread):
 
     def run(self):
         logger = logging.getLogger(__name__)
-        while not self.stopped.wait(0.1):
+        while not self.stopped.wait(0.5):
             if self.changed:
                 logger.info("LED color(s) changed, showing the new color(s)")
                 self.pixels.show()

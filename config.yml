@@ -1,6 +1,6 @@
 controller: "rpi"
 leds: 50
-color_picker: "category"
+color_picker: "temp"
 rpi:
   data_pin: 10
   clock_pin: 11
@@ -126,55 +126,55 @@ stations:
   # Maryland
   - code: KADW
     name: Andrews Air Force Base
-    led:
+    led: 37
   - code: KBWI
     name: Baltimore-Washington International Airport
-    led:
+    led: 38
   # Washington D.C.
   # Michigan
   - code: KDTW
     name: Detroit Metropolitan Wayne County Airport
-    led:
+    led: 39
   # Minnesota
   - code: KMSP
     name: Minneapolis-Saint Paul International Airport
-    led:
+    led: 40
   # Missouri
   - code: KMCI
     name: Kansas City International Airport
-    led: 
+    led: 41
   - code: KSTL
     name: Lambert-St. Louis International Airport
-    led:
+    led: 42
   # North Carolina
   - code: KCLT
     name: Charlotte Douglas International Airport
-    led:
+    led: 43
   # Ohio
   - code: KCLE
     name: Cleveland Hopkins International Airport
-    led:
+    led: 44
   # Texas
   - code: KDFW 
     name: Dallas/Fort Worth International Airport
-    led: 
+    led: 45
   - code: KHOU
     name: William P. Hobby Airport
-    led:
+    led: 46
   - code: KIAH
     name: George Bush Intercontinental Airport
-    led:
+    led: 47
   # Utah
   - code: KSLC
     name: Salt Lake City International Airport
-    led:
+    led: 48
   # Virginia
   - code: KDCA
     name: Ronald Reagan Washington National Airport
-    led:
+    led: 49
   - code: KIAD
     name: Washington Dulles International Airport
-    led: 
+    led: 0
   # Washington
   - code: KSEA
     name: Seattle-Tacoma International Airport
@@ -219,10 +219,11 @@ stations:
     led: 
   - code: KTPA
     name: Tampa International Airport
+    led:
   # Arizona
   - code: KPHX
     name: Phoenix Sky Harbor International Airport
-    led: 45
+    led:
   # California
   - code: KSFO
     name: San Francisco
@@ -264,3 +265,4 @@ stations:
   - code:
     name:
     led:
+    
