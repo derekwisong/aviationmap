@@ -91,8 +91,12 @@ class GradientColorPicker:
         return self.color(temperature)
 
 pickers = {'category': CategoryColorPicker(),
-           'temp': GradientColorPicker(-10, 48, gradient=multi_gradient(((0,0,255),(0,255,0),(255,0,0))), metar='temp'),
-           'temp2': GradientColorPicker(0, 40, steps=10, metar='temp'),
+           'temp': GradientColorPicker(-17, 38,
+                                       gradient=multi_gradient(((0,0,255),
+                                                                (0,255,0),
+                                                                (255,0,0)),
+                                                               n=14),
+                                       metar='temp'),
            'wind_speed': GradientColorPicker(0, 20, steps=20, metar='wind_speed'),
            'altimeter': GradientColorPicker(25, 35, steps=10, metar='altimeter')}
 
@@ -163,8 +167,8 @@ class LedMap:
               led_seen.add(code)
 
             self.data.add_station(code)
-            station = Station(code, name, num, self.data, self.led_controller,
-                    color_picker=config['color_picker'])
+            station = Station(code, name, num, self.data, self.led_controller)
+            station.set_color_picker(config['color_picker'])
             station.start()
             self.stations[code] = station
         
@@ -173,6 +177,10 @@ class LedMap:
     def set_all_stations_color(self, r, g, b):
         for station in self.stations.values():
             station.set_color(r, g, b)
+
+    def set_color_picker(self, picker_name):
+        for station in self.stations.values():
+            station.set_color_picker(picker_name)
     
     def stop(self):
         self.data.stop()

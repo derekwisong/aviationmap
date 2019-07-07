@@ -1,6 +1,6 @@
 controller: "rpi"
 leds: 50
-color_picker: "temp"
+color_picker: "category"
 rpi:
   data_pin: 10
   clock_pin: 11

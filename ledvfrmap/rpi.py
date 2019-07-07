@@ -3,6 +3,7 @@ import Adafruit_WS2801
 import Adafruit_GPIO.SPI as SPI
 import threading
 import logging
+import time
 
 class LEDController(threading.Thread):
     def __init__(self, pixel_count, clock_pin, data_pin):
@@ -16,6 +17,7 @@ class LEDController(threading.Thread):
 
     def stop(self):
         self.stopped.set()
+        self.all_off()
 
     def all_off(self):
         self.lock.acquire()
@@ -45,12 +47,9 @@ class LEDController(threading.Thread):
 
         while not self.stopped.wait(0.1):
             if self.changed:
-                logger.info("LED color(s) changed, showing the new color(s)")
                 self.lock.acquire()
                 try:
                     self.pixels.show()
                 finally:
                     self.lock.release()
                     self.changed = False
-
-        self.all_off()
