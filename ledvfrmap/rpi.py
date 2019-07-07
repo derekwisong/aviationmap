@@ -10,7 +10,6 @@ class LEDController(threading.Thread):
         self.pixels = Adafruit_WS2801.WS2801Pixels(pixel_count,
                                                    clk=clock_pin,
                                                    do=data_pin)
-        self.all_off()
         self.changed = False
         self.stopped = threading.Event()
         self.lock = threading.Lock()
@@ -42,6 +41,8 @@ class LEDController(threading.Thread):
         
     def run(self):
         logger = logging.getLogger(__name__)
+        self.all_off()
+
         while not self.stopped.wait(0.1):
             if self.changed:
                 logger.info("LED color(s) changed, showing the new color(s)")
