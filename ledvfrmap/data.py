@@ -71,3 +71,15 @@ class MetarMonitor(threading.Thread):
 
     def stop(self):
         self.stopped.set()
+
+# https://app.swaggerhub.com/apis/FAA/ASWS/1.1.0
+
+# This returns JSON with status information for KATL
+# https://soa.smext.faa.gov/asws/api/airport/status/KATL
+
+# This returns delay information
+# https://soa.smext.faa.gov/asws/api/airport/delays
+# url = "https://soa.smext.faa.gov/asws/api/airport/delays"                                                                                                                              
+# requests.get(url, headers={'accept':'application/json'}).text                                                                                                                          
+# '{"status":{"code":200,"info":"OK","count":0},"GroundDelays":{"groundDelay":[],"count":0},"GroundStops":{"groundStop":[],"count":0},"ArriveDepartDelays":{"arriveDepart":[],"count":0},"Closures":{"closure":[],"count":0}}'
+
