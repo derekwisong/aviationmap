@@ -1,0 +1,14 @@
+[Unit]
+Description=LED VFR Map
+After=network.target
+
+[Service]
+ExecStart=python -u main.py
+WorkingDirectory=/home/map/src/avwx
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=map
+
+[Install]
+WantedBy=multi-user.target
