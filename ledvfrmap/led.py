@@ -18,7 +18,7 @@ class TestLEDController:
         logger = logging.getLogger(__name__)
         color = (r, g, b)
         if self.pixels[pixel_number] != color:
-            logger.info("Test controller setting LED {} to {}".format(pixel_number, color))
+            logger.debug("Test controller setting LED {} to {}".format(pixel_number, color))
             self.pixels[pixel_number] = color
  
     def get_rgb(self, pixel_number):

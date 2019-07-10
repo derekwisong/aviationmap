@@ -1,5 +1,6 @@
-controller: "rpi"
+controller: "test"
 leds: 50
+database: sqlite:///ledvfrmap.db
 color_picker: "category"
 rpi:
   data_pin: 10

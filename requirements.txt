@@ -5,3 +5,4 @@ adafruit-ws2801
 # python packages required
 requests
 pyyaml
+sqlalchemy

@@ -5,11 +5,15 @@ import logging
 import datetime
 import avwx.tds
 
+from . import db
+
 class Data:
-    def __init__(self):
-        self.metar_monitor = MetarMonitor()
+    def __init__(self, database_conn_str):
         self.stations = set()
-    
+        self.database_conn_str = database_conn_str
+        self.database = db.Database(database_conn_str)
+        self.metar_monitor = MetarMonitor(self.database)
+        
     def add_station(self, station):
         self.stations.add(station)
         self.metar_monitor.add_station(station)
@@ -27,14 +31,15 @@ class Data:
         self.metar_monitor.stop()
 
 class MetarMonitor(threading.Thread):
-    def __init__(self, stations=None):
+    def __init__(self, database, stations=None):
         threading.Thread.__init__(self)
 
         if stations is not None:
             self.stations = set(stations)
         else:
             self.stations = set()
-
+        
+        self.database = database
         self.metar = {}
         self.last_update = None
         self.stopped = threading.Event()
@@ -59,6 +64,7 @@ class MetarMonitor(threading.Thread):
 
         try:
             self.metar = avwx.tds.get_latest_metar(self.stations)
+            self.database.add_metars(self.metar)
             self.last_update = datetime.datetime.utcnow()
         except:
             logger.exception("Unable to update metar data")

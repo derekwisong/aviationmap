@@ -53,7 +53,7 @@ class CategoryColorPicker:
         return self.category_colors[value]
 
     def pick_color(self, station):
-        category = station.get_metar_value('category')
+        category = station.get_metar_value('flight_category')
         
         try:
             return self.category_colors[category]
@@ -66,7 +66,7 @@ class GradientColorPicker:
                  gradient_end=(255, 0, 0),
                  gradient=None,
                  steps=10,
-                 metar='temp'):
+                 metar='temp_c'):
         self.min_value = min_value
         self.max_value = max_value
         if gradient is not None:
@@ -96,9 +96,9 @@ pickers = {'category': CategoryColorPicker(),
                                                                 (0,255,0),
                                                                 (255,0,0)),
                                                                n=14),
-                                       metar='temp'),
-           'wind_speed': GradientColorPicker(0, 20, steps=20, metar='wind_speed'),
-           'altimeter': GradientColorPicker(25, 35, steps=10, metar='altimeter')}
+                                       metar='temp_c'),
+           'wind_speed': GradientColorPicker(0, 20, steps=20, metar='wind_speed_kt'),
+           'altimeter': GradientColorPicker(25, 35, steps=10, metar='altim_in_hg')}
 
 class Station(threading.Thread):
     def __init__(self, code, name, led_number, data, led_controller,
@@ -130,7 +130,7 @@ class Station(threading.Thread):
         logger = logging.getLogger(__name__)
         
         while not self._stopped.wait(1):
-            category = self.get_metar_value('category')
+            category = self.get_metar_value('flight_category')
             if category != self.category:
                 logger.info("{} category changed from {} to {}".format(self.code,
                                                                        self.category,
@@ -147,7 +147,7 @@ class LedMap:
     def __init__(self, config):
         logger = logging.getLogger(__name__)
         self.num_leds = config['leds']
-        self.data = data.Data()
+        self.data = data.Data(config['database'])
         self.stations = {}
         self.led_controller = get_led_controller(config)
         led_seen = set()
@@ -155,14 +155,16 @@ class LedMap:
         for station in config['stations']:
             code = station['code']
             name = station['name']
-            if code is not None: logger.info(code)
             num = station['led']
 
             if code is None or num is None:
                 continue
+            elif num > self.num_leds - 1:
+                message = "LED number for {} is out of range".format(code)
+                raise Exception(message)
 
             if code in led_seen:
-              raise Exception("led {} already seen".format(code))
+              raise Exception("LED {} already seen".format(code))
             else:
               led_seen.add(code)
 
