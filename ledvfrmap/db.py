@@ -46,13 +46,12 @@ class Database:
         Base.metadata.create_all(self.engine)
         self.Session = scoped_session(sessionmaker(bind=self.engine))
         
-    def add_metars(self, metars):
+    def add_metars(self, metar_data):
         logger = logging.getLogger(__name__)
         session = self.Session()
-        for station, metar_data in metars.items():
+        for station, data in metar_data.items():
             logger.debug("Adding {} METAR to database".format(station))
-            metar = Metar(**metar_data)
-            logger.debug("METAR: {}".format(metar))
+            metar = Metar(**data)
             session.merge(metar)
-        
+
         session.commit()
