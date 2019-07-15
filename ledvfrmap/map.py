@@ -8,16 +8,16 @@ from . import data
 def linear_gradient(start_rgb=(0, 0, 0),
                     finish_rgb=(255, 255, 255),
                     n=10):
-  gradient = [start_rgb]
+    gradient = [start_rgb]
 
-  for t in range(1, n):
-    curr_rgb = [
-      int(start_rgb[j] + (float(t)/(n - 1)) * (finish_rgb[j] - start_rgb[j]))
-      for j in range(3)
-    ]
-    gradient.append(tuple(curr_rgb))
+    for t in range(1, n):
+      curr_rgb = [
+        int(start_rgb[j] + (float(t)/(n - 1)) * (finish_rgb[j] - start_rgb[j]))
+        for j in range(3)
+       ]
+      gradient.append(tuple(curr_rgb))
 
-  return gradient
+    return gradient
 
 def multi_gradient(points, n=50):
     section_length = int(n/(len(points) - 1))
@@ -175,6 +175,19 @@ class LedMap:
             self.stations[code] = station
         
         self.data.start()
+        self.on = True
+        self.button = self.setup_button(config['rpi'])
+
+    def setup_button(self, config):
+        from . import rpi
+        rpi.setup(mode=config['gpio_mode'])
+        button_config = config['button']
+        button = rpi.Button(self,
+                            button_config['pin'],
+                            pull=button_config['pull'],
+                            long_press_time=button_config['long_press_time'] / 1000,
+                            bouncetime=button_config['bounce_time'])
+        return button
 
     def set_all_stations_color(self, r, g, b):
         for station in self.stations.values():
@@ -183,6 +196,22 @@ class LedMap:
     def set_color_picker(self, picker_name):
         for station in self.stations.values():
             station.set_color_picker(picker_name)
+
+    def lights_off(self):
+        if self.on:
+            self.led_controller.all_off()
+            self.on = False
+
+    def lights_on(self):
+        if not self.on:
+            self.led_controller.all_on()
+            self.on = True
+
+    def toggle_on_off(self):
+        if self.on:
+            self.lights_off()
+        else:
+            self.lights_on()
     
     def stop(self):
         self.data.stop()

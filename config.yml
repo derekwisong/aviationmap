@@ -1,10 +1,16 @@
-controller: "test"
+controller: "rpi"
 leds: 50
-database: sqlite:///ledvfrmap.db
+database: sqlite:////data/ledvfrmap.db
 color_picker: "category"
 rpi:
+  gpio_mode: "BCM"
   data_pin: 10
   clock_pin: 11
+  button:
+    pin: 4
+    pull: "DOWN"
+    long_press_time: 5000
+    bounce_time: 500
 stations:
   # Maine
   - code: KPQI
@@ -266,4 +272,3 @@ stations:
   - code:
     name:
     led:
-    
