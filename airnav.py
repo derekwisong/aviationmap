@@ -12,7 +12,8 @@ class Airport:
     def __init__(self, identifier):
         self.identifier = identifier
         self.url = "https://www.airnav.com/airport/{}".format(identifier)
-        self.content = requests.get(self.url, timeout=30.0)
+        headers = {'User-Agent':'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+        self.content = requests.get(self.url, timeout=30.0, headers=headers)
         self.soup = BeautifulSoup(self.content.text, 'html.parser')
 
     def runways(self):
@@ -42,10 +43,9 @@ class Airport:
                         if match:
                             length = match.group(1)
                             width = match.group(2)
-                            current_runway['length'] = length
-                            current_runway['width'] = width
+                            current_runway['length'] = int(length)
+                            current_runway['width'] = int(width)
         return runways
-
 
 if __name__ == '__main__':
     runways = Airport('KLGA').runways()
