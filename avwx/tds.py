@@ -90,18 +90,18 @@ def parse_xml_metar(xml_data):
         }
         try:
             data['cloud_base_ft_agl'] = float(sky['cloud_base_ft_agl'])
-        except KeyError:
+        except:
             data['cloud_base_ft_agl'] = None
         try:
             data['sky_cover'] = sky['sky_cover']
-        except KeyError:
+        except:
             data['sky_cover'] = None
 
         stations[id] = data
 
     return stations
 
-def get_latest_metar(stations):
+def get_latest_metar(stations, timeout=20.0):
     logger = logging.getLogger(__name__)
     logger.info("Requesting latest METAR data")
     opts = {'datasource': 'metars',
@@ -109,9 +109,9 @@ def get_latest_metar(stations):
             'format': 'xml',
             'stationString': ",".join(stations),
             'mostRecentForEachStation': 'constraint',
-            'hoursBeforeNow': '1.75'}
+            'hoursBeforeNow': '3.0'}
 
-    response = requests.get(TDS, params=opts, timeout=20.0)
+    response = requests.get(TDS, params=opts, timeout=timeout)
     
     if response.status_code == 200:
         return parse_xml_metar(response.text)
