@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 
-dimensions_re = re.compile("([0-9]+) +ft\.[ \n]+x ([0-9]+) ft.")
+dimensions_re = re.compile(r"([0-9]+) +ft\.[ \n]+x ([0-9]+) ft.")
 
 class Airport:
     def __init__(self, identifier, session=None):
