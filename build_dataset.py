@@ -5,6 +5,7 @@ import os
 import logging
 import airnav
 import time
+import faa
 
 logging.basicConfig(level=logging.INFO)
 
@@ -115,26 +116,18 @@ def get_airport_info(identifier):
     logger.info("Getting airport information for {}".format(identifier))
     info = {'station_id': identifier}
     try:
-        airport = airnav.Airport(identifier)
+        airport = faa.Airport(identifier)
+        airport.query()
     except:
         logger.error("Unable to query AirNav for {}".format(identifier))
         return None
     
-    if airport.content.status_code != 200:
-        logger.error("AirNav returned status {} for {}".format(airport.content.status_code, identifier))
+    if airport.res.status_code != 200:
+        logger.error("FAA returned status {} for {}".format(airport.res.status_code, identifier))
         return None
 
     try:
-        runways = airport.runways()
-        info['num_runways'] = len(runways)
-        lengths = [x['length'] for x in airport.runways()]
-        try:
-            info['avg_runway_len_ft'] = sum(lengths) / len(runways)
-        except ZeroDivisionError:
-            info['avg_runway_len_ft'] = None
-        
-        info['max_runway_len_ft'] = max(lengths)
-        info['min_runway_len_ft'] = min(lengths)
+        info = airport.runways()
         return info
     except:
         logger.exception("Unable to parse runway details for {}".format(identifier))
@@ -152,7 +145,7 @@ def get_airport_table(identifiers, cache=None):
             info = get_airport_info(identifier)
             if info is not None:
                 data.append(info)
-            time.sleep(1)
+            time.sleep(0.25)
         airport_table = pd.DataFrame(data)
         if cache is not None and len(airport_table) > 0:
             logger.info("Writing airport cache: {}".format(cache))
