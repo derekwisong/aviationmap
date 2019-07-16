@@ -8,12 +8,15 @@ import re
 
 dimensions_pattern = re.compile("([0-9]+) x ([0-9]+) ft.")
 
+session = requests.Session()
+
 class Airport:
     def __init__(self, identifier):
         self.identifier = identifier
         self.url = "https://www.airnav.com/airport/{}".format(identifier)
-        headers = {'User-Agent':'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-        self.content = requests.get(self.url, timeout=30.0, headers=headers)
+        headers = {'User-Agent':'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+                   'connection':'keep-alive','cache-control':'max-age=0','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3', 'accept-language':'en-US,en;q=0.9', 'host':'www.airnav.com', 'upgrade-insecure-requests':'1'}
+        self.content = session.get(self.url, timeout=30.0, headers=headers)
         self.soup = BeautifulSoup(self.content.text, 'html.parser')
 
     def runways(self):
