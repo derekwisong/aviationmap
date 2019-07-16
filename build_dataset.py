@@ -6,8 +6,46 @@ import logging
 import airnav
 import time
 import faa
+import threading
+from queue import Queue
 
 logging.basicConfig(level=logging.INFO)
+
+class AirportDownloader(threading.Thread):
+    def __init__(self, task_queue, result_queue):
+        threading.Thread.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+        self.stopped = threading.Event()
+        self.session = requests.Session()
+
+    def stop(self):
+        self.stopped.set()
+
+    def run(self):
+        logger = logging.getLogger(__name__)
+        while not self.stopped.wait(1.1):
+            identifier = self.task_queue.get()
+            
+            try:
+                if identifier is None:
+                    break
+                airport = faa.Airport(str(identifier))
+                airport.query(session=self.session)
+                runways = airport.runways()
+
+                if runways is not None and len(runways) > 0:
+                    logger.info("Found {} runways for {}".format(len(runways), identifier))
+                    for runway in runways:
+                        if runway is not None:
+                            self.result_queue.put(runway)
+                else:
+                    logger.warning("No runways found for {}".format(identifier))
+            except:
+                logger.exception("Unable to process {}".format(identifier))
+            finally:
+                self.task_queue.task_done()
+
 
 states = {
         'AK': 'Alaska',
@@ -134,19 +172,42 @@ def get_airport_info(identifier):
     
     return None
 
-def get_airport_table(identifiers, cache=None):
+def get_airport_table(identifiers, cache=None, num_threads=10):
     logger = logging.getLogger(__name__)
     if cache is not None and os.path.exists(cache):
         logger.info("Reading airport cache: {}".format(cache))
         airport_table = pd.read_pickle(cache)
     else:
-        data = []
+        task_queue = Queue()
+        result_queue = Queue()
+        threads = []
+        
         for identifier in identifiers:
-            info = get_airport_info(identifier)
-            if info is not None:
-                data.append(info)
-            time.sleep(0.25)
-        airport_table = pd.DataFrame(data)
+            task_queue.put(identifier)
+        
+        for _ in range(num_threads):
+            thread = AirportDownloader(task_queue, result_queue)
+            thread.start()
+            threads.append(thread)
+            task_queue.put(None)
+
+        logger.info("Waiting for threads to finish")
+        task_queue.join()
+        for thread in threads:
+            thread.join()
+        
+        result_queue.put(None)
+        runways = []
+        while True:
+            runway = result_queue.get()
+            try:
+                if runway is None: break
+                else: runways.append(runway)
+            finally:
+                result_queue.task_done()
+    
+        airport_table = pd.DataFrame(runways)
+
         if cache is not None and len(airport_table) > 0:
             logger.info("Writing airport cache: {}".format(cache))
             airport_table.to_pickle(cache)
@@ -154,4 +215,4 @@ def get_airport_table(identifiers, cache=None):
         
 
 metar_table = get_metars(cache='metars.pkl')
-airport_table = get_airport_table(metar_table['station_id'], cache='airports.pkl')
+airport_table = get_airport_table(metar_table['station_id'][:20], cache='airports.pkl', num_threads=1)
