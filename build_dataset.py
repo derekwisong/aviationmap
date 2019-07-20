@@ -214,5 +214,5 @@ def get_airport_table(identifiers, cache=None, num_threads=10):
     return airport_table
         
 
-metar_table = get_metars(cache='metars.pkl')
-airport_table = get_airport_table(metar_table['station_id'][:20], cache='airports.pkl', num_threads=1)
+metar_table = get_metars(cache='data/metars.pkl')
+airport_table = get_airport_table(metar_table['station_id'][:20], cache='data/airports.pkl', num_threads=1)
