@@ -34,3 +34,43 @@ m(list(df['longitude']), list(df['latitude']))
 x, y = m(list(df['longitude']), list(df['latitude']))
 m.scatter(x,y,1, marker='o', color='red')
 ```
+
+# Features
+
+## Button
+
+- Short press
+    - Switch to next mode
+- Long press (2s)
+    - Replay last 12 hours of current mode
+        - Ignore button input for duration of replay
+        - Fade lights to 0% over 2 seconds
+        - Wait 1 second
+        - Replay one hour per second
+        - Fade lights to 0% over 2 seconds
+        - Wait 1 second
+        - Return to current mode's display
+    - Return to real-time after replay
+- Very long press (5s)
+    - Turn off lighs
+- If lights are off, next press of any duration turns lights back on
+
+## Brighness
+
+- Brightness automatically controlled using surise/sunset times.
+- Or if defined in config file, use that schedule
+
+## Modes
+
+1. Flight category (pulse if wind gusts > 15 kts)
+2. Wind speed (blink if wind gusts > 15 kts)
+3. Temperature
+4. Pressure (altimeter setting)
+5. 
+
+# Wish List
+
+- Potentiometer
+    - Could be used to control brightness
+- Photosensor
+    - Automatically adjust brighness according to ambient light

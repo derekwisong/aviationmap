@@ -3,6 +3,7 @@
 import threading
 import logging
 import datetime
+import requests
 import avwx.tds
 
 from . import db
@@ -66,8 +67,12 @@ class MetarMonitor(threading.Thread):
             self.metar = avwx.tds.get_latest_metar(self.stations)
             self.database.add_metars(self.metar)
             self.last_update = datetime.datetime.utcnow()
+        except requests.exceptions.Timeout:
+            logger.error("Timeout while getting METAR data")
+        except requests.exceptions.ConnectionError:
+            logger.error("Unable to connect to METAR data source")
         except:
-            logger.exception("Unable to update metar data")
+            logger.excepion("Problem handling METAR data")
 
     def run(self):
         self.update()
