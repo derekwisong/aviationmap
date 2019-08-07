@@ -18,6 +18,9 @@ class Color:
     
     def rgb(self):
         return (self.r, self.g, self.b)
+    
+    def __str__(self):
+        return "Color {}".format((self.r, self.g, self.b))
 
 
 class Led:
@@ -26,6 +29,9 @@ class Led:
         self._color = Color(0, 0, 0)
         self._on = True
     
+    def is_on(self):
+        return self._on
+
     def on(self):
         self._on = True
     
@@ -46,6 +52,10 @@ class Led:
     def color(self, color):
         self._color = color
 
+    def __str__(self):
+        return "Led ({n}, {onoff}): {color}".format(n=self.number,
+            onoff="On" if self._on else "Off",
+            color=self._color)
 
 class Airport:
     def __init__(self, icao_id, led):
@@ -58,9 +68,13 @@ class LedController(threading.Thread):
         threading.Thread.__init__(self)
         self.leds = leds
         self._stopped = threading.Event()
-        self.colors = {}
-        self.changed = []
+        self._state = {}
+        self._changed = []
     
+    @property
+    def changed(self):
+        return self._changed
+
     def stop(self):
         self._stopped.set()
     
@@ -70,22 +84,26 @@ class LedController(threading.Thread):
                 self.update_led(led)
 
             self.show()
+            self._changed.clear()
+
 
     def update_led(self, led):
         new_color = led.color.rgb()
+        new_state = led.is_on()
+
         is_new = False
-        logger = logging.getLogger(__name__)
-        if led.number not in self.colors:
+
+        if led not in self._state:
             is_new = True
         else:
-            if new_color != self.colors[led.number]:
+            if new_color != self._state[led]['color']:
+                is_new = True
+            elif new_state != self._state[led]['state']:
                 is_new = True
         
         if is_new:
-            self.colors[led.number] = new_color
-            self.changed.append(led.number)
-            logger.info("LED {} changed to {}".format(led.number, new_color))
-
+            self._state[led] = {'color': new_color, 'state': new_state}
+            self.changed.append(led)
 
     def show(self):
         pass
@@ -97,10 +115,8 @@ class ConsoleLedController(LedController):
 
     def show(self):
         logger = logging.getLogger(__name__)
-        for led_number in self.changed:
-            logger.info("LED {} is now {}".format(led_number, self.colors[led_number]))
-
-        self.changed = []    
+        for led in self.changed:
+            logger.info("Showing LED {}".format(led))
 
 
 class RaspberryPiLedController(LedController):
@@ -118,14 +134,17 @@ class RaspberryPiLedController(LedController):
         
     def show(self):
         logger = logging.getLogger(__name__)
-        for led_number in self.changed:
-            logger.info("LED {} is now {}".format(led_number, self.colors[led_number]))
-            self.pixels.set_pixel_rgb(led_number, *self.colors[led_number])
-       
+        for led in self.changed:
+            color = self._state[led]['color']
+            logger.info("Showing LED {}".format(led))
+
+            if self._state['led']['state']:
+                self.pixels.set_pixel_rgb(led.number, *color)
+            else:
+                self.pixels.set_pixel_rgb(led.number, 0, 0, 0)
+
         if len(self.changed) > 0:
             self.pixels.show()
-
-        self.changed = []
 
 
 class LedMap:
@@ -154,6 +173,10 @@ class LedMap:
             airports[code] = airport
 
         self._airports = airports
+
+    def stop(self):
+        self._led_controller.stop()
+        self._led_controller.join()
 
     @property
     def airports(self):
