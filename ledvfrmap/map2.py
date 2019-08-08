@@ -162,9 +162,59 @@ class RaspberryPiLedController(LedController):
         if len(self.changed) > 0:
             self.pixels.show()
 
+class LedDisplay(threading.Thread):
+    def __init__(self, airports, data):
+        threading.Thread.__init__(self)
+        self._airports = airports
+        self._data = data
+        self._stopped = threading.Event()
+    
+    def stop(self):
+        self._stopped.set()
+    
+    @property
+    def stopped(self):
+        return self._stopped.is_set()
+    
+
+class FlightCategoryDisplay(LedDisplay):
+    cat_colors = {'VFR': Color(0, 255, 0),
+                  'MVFR': Color(0, 0, 255),
+                  'IFR': Color(255, 0, 0),
+                  'LIFR': Color(255, 0, 255)}
+
+    def __init__(self, airports, data, gust_alert=None):
+        LedDisplay.__init__(self, airports, data)
+        self.gust_alert = gust_alert
+    
+    def update(self):
+        for airport in self._airports:
+            flight_category = self._data.get_metar_value(airport.icao_id, 'flight_category')
+            gusts = self._data.get_metar_value(airport.icao_id, 'wind_gust_kt')
+
+            if (gusts is not None) and (self.gust_alert is not None) and gusts >= self.gust_alert:
+                gusting = True
+            else:
+                gusting = False
+
+            # if gusting is true, blink or pulse the light
+            
+            if flight_category in self.cat_colors:
+                color = self.cat_colors[flight_category]
+            else:
+                color = Color(0, 0, 0)
+
+            airport.led.color = color
+
+    def run(self):
+        self.update()
+
+        while not self._stopped.wait(0.1):
+            self.update()
 
 class LedMap:
     def __init__(self, config_file):
+        self._display = None
         self._airports = {}
         self._led_controller = None
 
@@ -177,9 +227,27 @@ class LedMap:
 
         self._data.start()
 
+        if self.config['display'] == 'flight_category':
+            gust_level = int(self.config['modes']['flight_category']['gust_pulse'])
+            initial_display = FlightCategoryDisplay(self.airports.values(), self._data, gust_alert=gust_level)
+        else:
+            raise Exception("Unknown display: {}".format(self.config['display']))
+
+        self.set_display(initial_display)
+
     def _setup_led_controller(self):
         leds = [airport.led for airport in self.airports.values()]
-        self._led_controller = ConsoleLedController(leds)
+        controller = self.config['controller']
+
+        if controller == 'console':
+            self._led_controller = ConsoleLedController(leds)
+        elif controller == 'rpi':
+            clock_pin = self.config['rpi']['clock_pin']
+            data_pin = self.config['rpi']['data_pin']
+            self._led_controller = RaspberryPiLedController(leds, clock_pin, data_pin)
+        else:
+            raise Exception("Unknown LED controller: {}".format(controller))
+
         self._led_controller.start()
 
     def _setup_airports(self):
@@ -198,6 +266,16 @@ class LedMap:
         self._led_controller.stop()
         self._data.stop()
         self._led_controller.join()
+        self._display.stop()
+        self._display.join()
+
+    def set_display(self, display):
+        if self._display is not None:
+            self._display.stop()
+            self._display.join()
+        self._display = display
+        self._display.start()
+
 
     @property
     def airports(self):

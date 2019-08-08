@@ -1,7 +1,6 @@
-color_picker: category
-controller: test
+display: flight_category
+controller: console
 database: sqlite:///ledvfrmap.db
-leds: 150
 rpi:
   button:
     bounce_time: 500
