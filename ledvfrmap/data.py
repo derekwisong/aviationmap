@@ -30,6 +30,7 @@ class Data:
     
     def stop(self):
         self.metar_monitor.stop()
+        self.metar_monitor.join()
 
 class MetarMonitor(threading.Thread):
     def __init__(self, database, stations=None):
@@ -72,7 +73,7 @@ class MetarMonitor(threading.Thread):
         except requests.exceptions.ConnectionError:
             logger.error("Unable to connect to METAR data source")
         except:
-            logger.excepion("Problem handling METAR data")
+            logger.exception("Problem handling METAR data")
 
     def run(self):
         self.update()

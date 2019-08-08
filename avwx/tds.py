@@ -86,7 +86,7 @@ def parse_xml_metar(xml_data):
             'snow_in': item_float(metar.find('snow_in')),
             'vert_vis_ft': item_int(metar.find('vert_vis_ft')),
             'metar_type': item_text(metar.find('metar_type')),
-            'raw_xml': xml_data
+            'raw_xml': ET.tostring(metar)
         }
         try:
             data['cloud_base_ft_agl'] = float(sky['cloud_base_ft_agl'])

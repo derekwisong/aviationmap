@@ -8,7 +8,10 @@ and updates the displayed color.
 import threading
 import logging
 import yaml
+import time
+import os
 
+from . import data
 
 class Color:
     def __init__(self, r, g, b):
@@ -59,17 +62,25 @@ class Led:
 
 class Airport:
     def __init__(self, icao_id, led):
-        self.icao_id = icao_id
+        self._icao_id = icao_id
         self.led = led
+    
+    @property
+    def icao_id(self):
+        return self._icao_id
+
+    def __str__(self):
+        return self.icao_id
 
 
 class LedController(threading.Thread):
-    def __init__(self, leds):
+    def __init__(self, leds, rate=10):
         threading.Thread.__init__(self)
         self.leds = leds
         self._stopped = threading.Event()
         self._state = {}
         self._changed = []
+        self.rate = rate
     
     @property
     def changed(self):
@@ -79,12 +90,17 @@ class LedController(threading.Thread):
         self._stopped.set()
     
     def run(self):
-        while not self._stopped.wait(0.1):
+        sleeptime = 0
+        
+        while not self._stopped.wait(sleeptime):
+            start = time.time()
             for led in self.leds:
                 self.update_led(led)
 
             self.show()
             self._changed.clear()
+            end = time.time()
+            sleeptime = max(0.05, (1 - (end-start) * self.rate) / self.rate)
 
 
     def update_led(self, led):
@@ -155,8 +171,11 @@ class LedMap:
         with open(config_file, 'rb') as config:
             self.config = yaml.load(config, Loader=yaml.Loader)
     
+        self._data = data.Data(self.config['database'])
         self._setup_airports()
         self._setup_led_controller()
+
+        self._data.start()
 
     def _setup_led_controller(self):
         leds = [airport.led for airport in self.airports.values()]
@@ -171,11 +190,13 @@ class LedMap:
             led = Led(airport_info['led'])
             airport = Airport(code, led)
             airports[code] = airport
+            self._data.add_station(code)
 
         self._airports = airports
 
     def stop(self):
         self._led_controller.stop()
+        self._data.stop()
         self._led_controller.join()
 
     @property
