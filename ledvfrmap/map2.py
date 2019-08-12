@@ -63,45 +63,52 @@ class Led:
 class Airport:
     def __init__(self, icao_id, led):
         self._icao_id = icao_id
-        self.led = led
+        self._led = led
+        self._metar = {}
     
+    @property
+    def led(self):
+        return self._led
+
     @property
     def icao_id(self):
         return self._icao_id
+
+    @property
+    def metar(self):
+        return self._metar
+    
+    @metar.setter
+    def metar(self, new_metar):
+        self._metar = new_metar
+
+    def metar_value(self, item):
+        try:
+            return self.metar[item]
+        except KeyError:
+            return None
 
     def __str__(self):
         return self.icao_id
 
 
-class LedController(threading.Thread):
-    def __init__(self, leds, rate=10):
-        threading.Thread.__init__(self)
+class LedController:
+    def __init__(self, leds):
         self.leds = leds
-        self._stopped = threading.Event()
         self._state = {}
         self._changed = []
-        self.rate = rate
     
     @property
     def changed(self):
         return self._changed
-
-    def stop(self):
-        self._stopped.set()
     
-    def run(self):
-        sleeptime = 0
-        
-        while not self._stopped.wait(sleeptime):
-            start = time.time()
-            for led in self.leds:
-                self.update_led(led)
+    def update(self):
+        for led in self.leds:
+            self.update_led(led)
 
+        if len(self.changed) > 0:
             self.show()
             self._changed.clear()
-            end = time.time()
-            sleeptime = max(0.05, (1 - (end-start) * self.rate) / self.rate)
-
 
     def update_led(self, led):
         new_color = led.color.rgb()
@@ -122,6 +129,9 @@ class LedController(threading.Thread):
             self.changed.append(led)
 
     def show(self):
+        pass
+    
+    def clear(self):
         pass
 
 
@@ -147,7 +157,11 @@ class RaspberryPiLedController(LedController):
         if clear:
             self.pixels.clear()
             self.show()
-        
+    
+    def clear(self):
+        self.pixels.clear()
+        self.show()
+
     def show(self):
         logger = logging.getLogger(__name__)
         for led in self.changed:
@@ -168,6 +182,7 @@ class LedDisplay(threading.Thread):
         self._airports = airports
         self._data = data
         self._stopped = threading.Event()
+        self._led_controller = None
     
     def stop(self):
         self._stopped.set()
@@ -176,6 +191,13 @@ class LedDisplay(threading.Thread):
     def stopped(self):
         return self._stopped.is_set()
     
+    @property
+    def led_controller(self):
+        return self._led_controller
+    
+    @led_controller.setter
+    def led_controller(self, controller):
+        self._led_controller = controller
 
 class FlightCategoryDisplay(LedDisplay):
     cat_colors = {'VFR': Color(0, 255, 0),
@@ -189,8 +211,8 @@ class FlightCategoryDisplay(LedDisplay):
     
     def update(self):
         for airport in self._airports:
-            flight_category = self._data.get_metar_value(airport.icao_id, 'flight_category')
-            gusts = self._data.get_metar_value(airport.icao_id, 'wind_gust_kt')
+            flight_category = airport.metar_value('flight_category')
+            gusts = airport.metar_value('wind_gust_kt')
 
             if (gusts is not None) and (self.gust_alert is not None) and gusts >= self.gust_alert:
                 gusting = True
@@ -205,6 +227,7 @@ class FlightCategoryDisplay(LedDisplay):
                 color = Color(0, 0, 0)
 
             airport.led.color = color
+        self.led_controller.update()
 
     def run(self):
         self.update()
@@ -226,14 +249,7 @@ class LedMap:
         self._setup_led_controller()
 
         self._data.start()
-
-        if self.config['display'] == 'flight_category':
-            gust_level = int(self.config['modes']['flight_category']['gust_pulse'])
-            initial_display = FlightCategoryDisplay(self.airports.values(), self._data, gust_alert=gust_level)
-        else:
-            raise Exception("Unknown display: {}".format(self.config['display']))
-
-        self.set_display(initial_display)
+        self.set_display(self.config['display'])
 
     def _setup_led_controller(self):
         leds = [airport.led for airport in self.airports.values()]
@@ -248,8 +264,6 @@ class LedMap:
         else:
             raise Exception("Unknown LED controller: {}".format(controller))
 
-        self._led_controller.start()
-
     def _setup_airports(self):
         airports = {}
 
@@ -258,22 +272,31 @@ class LedMap:
             led = Led(airport_info['led'])
             airport = Airport(code, led)
             airports[code] = airport
-            self._data.add_station(code)
+            self._data.add_airport(airport)
 
         self._airports = airports
 
     def stop(self):
-        self._led_controller.stop()
         self._data.stop()
-        self._led_controller.join()
         self._display.stop()
         self._display.join()
+        self._led_controller.clear()
 
     def set_display(self, display):
         if self._display is not None:
             self._display.stop()
             self._display.join()
-        self._display = display
+        
+        if type(display) == str:
+            if display == 'flight_category':
+                gust_level = int(self.config['modes']['flight_category']['gust_pulse'])
+                self._display = FlightCategoryDisplay(self.airports.values(), self._data, gust_alert=gust_level)
+            else:
+                raise Exception("Unknown display: {}".format(self.config['display']))
+        else:
+            self._display = display
+
+        self._display.led_controller = self.led_controller
         self._display.start()
 
 
