@@ -10,21 +10,15 @@ from . import db
 
 class Data:
     def __init__(self, database_conn_str):
-        self.stations = set()
+        self.airports = set()
         self.database_conn_str = database_conn_str
         self.database = db.Database(database_conn_str)
         self.metar_monitor = MetarMonitor(self.database)
         
-    def add_station(self, station):
-        self.stations.add(station)
-        self.metar_monitor.add_station(station)
+    def add_airport(self, airport):
+        self.airports.add(airport)
+        self.metar_monitor.add_airport(airport)
     
-    def get_metar(self, station):
-        return self.metar_monitor.get_metar(station)
-    
-    def get_metar_value(self, station, item):
-        return self.metar_monitor.get_metar_value(station, item)
-
     def start(self):
         self.metar_monitor.start()
     
@@ -33,39 +27,27 @@ class Data:
         self.metar_monitor.join()
 
 class MetarMonitor(threading.Thread):
-    def __init__(self, database, stations=None):
+    def __init__(self, database):
         threading.Thread.__init__(self)
-
-        if stations is not None:
-            self.stations = set(stations)
-        else:
-            self.stations = set()
-        
+        self.airports = {}
         self.database = database
         self.metar = {}
         self.last_update = None
         self.stopped = threading.Event()
 
-    def add_station(self, station):
-        self.stations.add(station)
-    
-    def get_metar(self, station):
-        return self.metar.get(station)
-    
-    def get_metar_value(self, station, item):
-        metar = self.get_metar(station)
-        if metar:
-            return metar.get(item)
-        else:
-            return None
+    def add_airport(self, airport):
+        self.airports[airport.icao_id] = airport
 
     def update(self):
         logger = logging.getLogger(__name__)
-        if len(self.stations) == 0:
+        if len(self.airports) == 0:
             return
 
         try:
-            self.metar = avwx.tds.get_latest_metar(self.stations)
+            self.metar = avwx.tds.get_latest_metar(self.airports.keys())
+            for code, metar in self.metar.items():
+                airport = self.airports[code]
+                airport.metar = metar
             self.database.add_metars(self.metar)
             self.last_update = datetime.datetime.utcnow()
         except requests.exceptions.Timeout:
