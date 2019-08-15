@@ -169,17 +169,21 @@ class RaspberryPiLedController(LedController):
         self.pixels.clear()
         self.show()
 
-    def show(self):
-        logger = logging.getLogger(__name__)
-        for led in self.changed:
-            color = self._state[led]['color']
-            logger.debug("Showing LED {}".format(led))
+    def update_led(self, led):
+        changed = super.update_led(led)
+ 
+        if changed:
+            logger = logging.getLogger(__name__)
+            logger.debug("Updated LED {}".format(led))
 
             if self._state[led]['state']:
-                self.pixels.set_pixel_rgb(led.number, *color)
+                self.pixels.set_pixel_rgb(led.number, self._state[led]['color'])
             else:
                 self.pixels.set_pixel_rgb(led.number, 0, 0, 0)
 
+        return changed
+
+    def show(self):
         if len(self.changed) > 0:
             self.pixels.show()
 
