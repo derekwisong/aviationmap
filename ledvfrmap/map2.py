@@ -170,7 +170,7 @@ class RaspberryPiLedController(LedController):
         self.show()
 
     def update_led(self, led):
-        changed = super.update_led(led)
+        changed = super().update_led(led)
  
         if changed:
             logger = logging.getLogger(__name__)
