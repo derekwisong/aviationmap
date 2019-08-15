@@ -177,7 +177,7 @@ class RaspberryPiLedController(LedController):
             logger.debug("Updated LED {}".format(led))
 
             if self._state[led]['state']:
-                self.pixels.set_pixel_rgb(led.number, self._state[led]['color'])
+                self.pixels.set_pixel_rgb(led.number, *self._state[led]['color'])
             else:
                 self.pixels.set_pixel_rgb(led.number, 0, 0, 0)
 
