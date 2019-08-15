@@ -18,10 +18,13 @@ if __name__ == '__main__':
                         help="Show more verbose logging output")
     args = parser.parse_args()
 
+    logfmt = "[%(levelname)s %(asctime)s %(module)s %(threadName)s] %(message)s"
+    level = logging.INFO
+
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+        level = logging.DEBUG
+
+    logging.basicConfig(format=logfmt, level=level)
 
     if not os.path.exists(args.config):
         logger.error("Config file {} does not exist".format(args.config))

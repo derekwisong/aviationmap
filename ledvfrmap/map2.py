@@ -103,8 +103,12 @@ class LedController:
         return self._changed
     
     def update(self):
+        logger = logging.getLogger(__name__)
         for led in self.leds:
-            self.update_led(led)
+            is_changed = self.update_led(led)
+            if is_changed:
+                logger.debug("LED Changed: {}".format(led))
+                self.changed.append(led)
 
         if len(self.changed) > 0:
             self.show()
@@ -126,7 +130,8 @@ class LedController:
         
         if is_new:
             self._state[led] = {'color': new_color, 'state': new_state}
-            self.changed.append(led)
+
+        return is_new
 
     def show(self):
         pass
@@ -159,6 +164,8 @@ class RaspberryPiLedController(LedController):
             self.show()
     
     def clear(self):
+        logger = logging.getLogger(__name__)
+        logger.info("Clearing LEDs")
         self.pixels.clear()
         self.show()
 
@@ -166,7 +173,7 @@ class RaspberryPiLedController(LedController):
         logger = logging.getLogger(__name__)
         for led in self.changed:
             color = self._state[led]['color']
-            logger.info("Showing LED {}".format(led))
+            logger.debug("Showing LED {}".format(led))
 
             if self._state[led]['state']:
                 self.pixels.set_pixel_rgb(led.number, *color)
@@ -177,8 +184,8 @@ class RaspberryPiLedController(LedController):
             self.pixels.show()
 
 class LedDisplay(threading.Thread):
-    def __init__(self, airports, data):
-        threading.Thread.__init__(self)
+    def __init__(self, airports, data, name="LedDisplay"):
+        threading.Thread.__init__(self, name=name)
         self._airports = airports
         self._data = data
         self._stopped = threading.Event()
@@ -189,6 +196,8 @@ class LedDisplay(threading.Thread):
     
     @property
     def stopped(self):
+        logger = logging.getLogger(__name__)
+        logger.debug("Stopping LedDisplay")
         return self._stopped.is_set()
     
     @property
@@ -206,7 +215,7 @@ class FlightCategoryDisplay(LedDisplay):
                   'LIFR': Color(255, 0, 255)}
 
     def __init__(self, airports, data, gust_alert=None):
-        LedDisplay.__init__(self, airports, data)
+        LedDisplay.__init__(self, airports, data, name="FlightCategoryDisplay")
         self.gust_alert = gust_alert
     
     def update(self):
