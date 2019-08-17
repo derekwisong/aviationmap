@@ -96,23 +96,6 @@ class LedController:
     def __init__(self, leds):
         self.leds = leds
         self._state = {}
-        self._changed = []
-    
-    @property
-    def changed(self):
-        return self._changed
-    
-    def update(self):
-        logger = logging.getLogger(__name__)
-        for led in self.leds:
-            is_changed = self.update_led(led)
-            if is_changed:
-                logger.debug("LED Changed: {}".format(led))
-                self.changed.append(led)
-
-        if len(self.changed) > 0:
-            self.show()
-            self._changed.clear()
 
     def update_led(self, led):
         new_color = led.color.rgb()
@@ -144,24 +127,27 @@ class ConsoleLedController(LedController):
     def __init__(self, leds):
         LedController.__init__(self, leds)
 
+    def update_led(self, led):
+        changed = super().update_led(led)
+        if changed:
+            logger = logging.getLogger(__name__)
+            logger.info("Led changed: {}".format(led))
+        return changed
+    
     def show(self):
         logger = logging.getLogger(__name__)
-        for led in self.changed:
-            logger.info("Showing LED {}".format(led))
+        logger.info("Showing LEDs")
 
 
 class RaspberryPiLedController(LedController):
     def __init__(self, leds, clock_pin, data_pin, clear=True):
         LedController.__init__(self, leds)
-        import RPi.GPIO as GPIO
         import Adafruit_WS2801
-        import Adafruit_GPIO.SPI as SPI
         self.pixels = Adafruit_WS2801.WS2801Pixels(len(leds),
                                                    clk=clock_pin,
                                                    do=data_pin)
         if clear:
-            self.pixels.clear()
-            self.show()
+            self.clear()
     
     def clear(self):
         logger = logging.getLogger(__name__)
@@ -173,19 +159,18 @@ class RaspberryPiLedController(LedController):
         changed = super().update_led(led)
  
         if changed:
-            logger = logging.getLogger(__name__)
-            logger.debug("Updated LED {}".format(led))
-
             if self._state[led]['state']:
                 self.pixels.set_pixel_rgb(led.number, *self._state[led]['color'])
             else:
                 self.pixels.set_pixel_rgb(led.number, 0, 0, 0)
 
+            logger = logging.getLogger(__name__)
+            logger.debug("Updated LED {}".format(led))
+
         return changed
 
     def show(self):
-        if len(self.changed) > 0:
-            self.pixels.show()
+        self.pixels.show()
 
 class LedDisplay(threading.Thread):
     def __init__(self, airports, data, name="LedDisplay"):
@@ -222,25 +207,22 @@ class FlightCategoryDisplay(LedDisplay):
         LedDisplay.__init__(self, airports, data, name="FlightCategoryDisplay")
         self.gust_alert = gust_alert
     
+    @staticmethod
+    def get_category_color(category):
+        if category in FlightCategoryDisplay.cat_colors:
+            return FlightCategoryDisplay.cat_colors[category]
+        else:
+            return Color(0, 0, 0)
+    
     def update(self):
+        changed = False
         for airport in self._airports:
             flight_category = airport.metar_value('flight_category')
-            gusts = airport.metar_value('wind_gust_kt')
+            airport.led.color = FlightCategoryDisplay.get_category_color(flight_category)
+            changed |= self.led_controller.update_led(airport.led)
 
-            if (gusts is not None) and (self.gust_alert is not None) and gusts >= self.gust_alert:
-                gusting = True
-            else:
-                gusting = False
-
-            # if gusting is true, blink or pulse the light
-            
-            if flight_category in self.cat_colors:
-                color = self.cat_colors[flight_category]
-            else:
-                color = Color(0, 0, 0)
-
-            airport.led.color = color
-        self.led_controller.update()
+        if changed:
+            self.led_controller.show()
 
     def run(self):
         self.update()
