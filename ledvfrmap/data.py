@@ -5,6 +5,7 @@ import logging
 import datetime
 import requests
 import avwx.tds
+import time
 
 from . import db
 
@@ -45,10 +46,13 @@ class MetarMonitor(threading.Thread):
 
         try:
             self.metar = avwx.tds.get_latest_metar(self.airports.keys())
+            self.database.add_metars(self.metar)
+            time.sleep(0.05)
+            
             for code, metar in self.metar.items():
                 airport = self.airports[code]
                 airport.metar = metar
-            self.database.add_metars(self.metar)
+            
             self.last_update = datetime.datetime.utcnow()
         except requests.exceptions.Timeout:
             logger.error("Timeout while getting METAR data")

@@ -27,10 +27,11 @@ class Color:
 
 
 class Led:
-    def __init__(self, number):
+    def __init__(self, number, name=None):
         self.number = number
         self._color = Color(0, 0, 0)
         self._on = True
+        self._name = name
     
     def is_on(self):
         return self._on
@@ -56,15 +57,18 @@ class Led:
         self._color = color
 
     def __str__(self):
-        return "Led ({n}, {onoff}): {color}".format(n=self.number,
+        return "Led ({n}:{name}, {onoff}): {color}".format(n=self.number,
             onoff="On" if self._on else "Off",
-            color=self._color)
+            color=self._color,
+            name=self._name)
 
 class Airport:
     def __init__(self, icao_id, led):
         self._icao_id = icao_id
         self._led = led
         self._metar = {}
+        self._lock = threading.RLock()
+        self.neighbors = []
     
     @property
     def led(self):
@@ -76,17 +80,20 @@ class Airport:
 
     @property
     def metar(self):
-        return self._metar
+        with self._lock:
+            return self._metar
     
     @metar.setter
     def metar(self, new_metar):
-        self._metar = new_metar
+        with self._lock:
+            self._metar = new_metar
 
     def metar_value(self, item):
-        try:
-            return self.metar[item]
-        except KeyError:
-            return None
+        with self._lock:
+            try:
+                return self.metar[item]
+            except KeyError:
+                return None
 
     def __str__(self):
         return self.icao_id
@@ -165,7 +172,7 @@ class RaspberryPiLedController(LedController):
                 self.pixels.set_pixel_rgb(led.number, 0, 0, 0)
 
             logger = logging.getLogger(__name__)
-            logger.debug("Updated LED {}".format(led))
+            logger.info("Updated LED {}".format(led))
 
         return changed
 
@@ -198,10 +205,10 @@ class LedDisplay(threading.Thread):
         self._led_controller = controller
 
 class FlightCategoryDisplay(LedDisplay):
-    cat_colors = {'VFR': Color(0, 255, 0),
-                  'MVFR': Color(0, 0, 255),
-                  'IFR': Color(255, 0, 0),
-                  'LIFR': Color(255, 0, 255)}
+    cat_colors = {'VFR': Color(0, 1, 0),
+                  'MVFR': Color(0, 0, 1),
+                  'IFR': Color(1, 0, 0),
+                  'LIFR': Color(1, 0, 1)}
 
     def __init__(self, airports, data, gust_alert=None):
         LedDisplay.__init__(self, airports, data, name="FlightCategoryDisplay")
@@ -215,9 +222,57 @@ class FlightCategoryDisplay(LedDisplay):
             return Color(0, 0, 0)
     
     def update(self):
+        logger = logging.getLogger(__name__)
         changed = False
         for airport in self._airports:
+            if airport.metar_value('observation_time') is None:
+                continue
+            
             flight_category = airport.metar_value('flight_category')
+
+            if flight_category is None:
+                # estimate the flight category if possible
+                ceiling = airport.metar_value('cloud_base_ft_agl')
+                visibility = airport.metar_value('visibility_statute_mi')
+                
+                n_neighbors = len(airport.neighbors)
+                try:
+                    if ceiling is None and n_neighbors > 0:
+                        neighbor_ceiling = 0
+                        for neighbor in airport.neighbors:
+                            if neighbor.metar_value('sky_cover') == 'CLR':
+                                neighbor_ceiling += 5000
+                            else:
+                                neighbor_ceiling += neighbor.metar_value('cloud_base_ft_agl')
+                                
+                        ceiling = neighbor_ceiling / n_neighbors
+
+                    if visibility is None and n_neighbors > 0:
+                        neighbor_visibility = 0
+                        neighbor_count = 0
+                        for neighbor in airport.neighbors:
+                            vis = neighbor.metar_value('visibility_statute_mi')
+                            if vis is not None:
+                                neighbor_visibility += vis
+                                neighbor_count += 1
+                            
+                        visibility = neighbor_visibility / neighbor_count
+
+                    if ceiling is None or visibility is None:
+                        continue
+                    elif ceiling > 3000 and visibility > 5:
+                        flight_category = 'VFR'
+                    elif (1000 <= ceiling <= 3000) and (3 <= visibility <= 5):
+                        flight_category = 'MVFR'
+                    elif (500 <= ceiling < 1000) or (1 <= visibility < 3):
+                        flight_category = 'IFR'
+                    elif (ceiling < 500) or (visibility < 1):
+                        flight_category = 'LIFR'
+                    else:
+                        flight_category = None
+                except:
+                    logger.exception("Unable to compute estimated flight category")
+                    
             airport.led.color = FlightCategoryDisplay.get_category_color(flight_category)
             changed |= self.led_controller.update_led(airport.led)
 
@@ -227,7 +282,7 @@ class FlightCategoryDisplay(LedDisplay):
     def run(self):
         self.update()
 
-        while not self._stopped.wait(0.1):
+        while not self._stopped.wait(5):
             self.update()
 
 class LedMap:
@@ -264,10 +319,17 @@ class LedMap:
 
         for airport_info in self.config['stations']:
             code = airport_info['code']
-            led = Led(airport_info['led'])
+            led = Led(airport_info['led'], name=code)
             airport = Airport(code, led)
             airports[code] = airport
             self._data.add_airport(airport)
+
+        for airport_info in self.config['stations']:
+            code = airport_info['code']
+            airport = airports[code]
+            if 'neighbors' in airport_info:
+                airport.neighbors = [airports[neighbor] for neighbor in airport_info['neighbors']]
+
 
         self._airports = airports
 

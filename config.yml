@@ -1,6 +1,6 @@
 display: flight_category
-controller: console
-database: sqlite:///ledvfrmap.db
+controller: rpi
+database: sqlite:////data/ledvfrmap.db
 rpi:
   button:
     bounce_time: 500
@@ -473,6 +473,9 @@ stations:
 - code: KBAM
   led: 148
   name: BATTLE MOUNTAIN
+  neighbors:
+   - KRNO
+   - KTWF
 - code: KRNO
   led: 149
   name: RENO/TAHOE INTL
