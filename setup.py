@@ -14,5 +14,7 @@ setup(
         long_description=read('README.md'),
         license="GPL",
         keywords="aviation weather map led vfr metar",
-        packages=['avwx', 'ledvfrmap']
+        packages=['avwx', 'ledvfrmap'],
+        scripts=['map2.py'],
+        data_files=['config.yml']
 )
