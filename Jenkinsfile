@@ -12,17 +12,12 @@ echo "Hello World"'''
     stage('Python Setup') {
       steps {
         sh '''#!/bin/bash
+set -e
 
-date
-pwd
-
-pip --version
-
-python --version
-
-python3 --version
-
-#python -m venv env'''
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+'''
       }
     }
 
