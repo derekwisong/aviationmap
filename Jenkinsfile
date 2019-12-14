@@ -16,7 +16,11 @@ echo "Hello World"'''
 date
 pwd
 
-python -m venv env'''
+python --version
+
+python3 --version
+
+#python -m venv env'''
       }
     }
 
