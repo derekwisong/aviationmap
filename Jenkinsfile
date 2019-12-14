@@ -16,6 +16,8 @@ echo "Hello World"'''
 date
 pwd
 
+pip --version
+
 python --version
 
 python3 --version
