@@ -15,8 +15,15 @@ env'''
         sh '''#!/bin/bash
 set -e
 
-python3 -m venv env
-source env/bin/activate
+PYENV_HOME=env
+
+if [ -d $PYENV_HOME ]
+then
+    rm -rf $PYENV_HOME
+fi
+
+python3 -m venv $PYENV_HOME
+source $PYENV_HOME/bin/activate
 
 pip install wheel
 pip install setuptools
@@ -32,7 +39,15 @@ python setup.py build install
         sh '''#!/bin/bash
 
 tar cvzf avwx_map.tar.gz env/ map2.py config.yml
-ls -l'''
+ls -lh'''
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sh '''#!/bin/bash
+
+scp avwx_map.tar.gz map@ledvfrmap:builds/'''
       }
     }
 
