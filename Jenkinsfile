@@ -5,8 +5,11 @@ pipeline {
       steps {
         sh '''#!/bin/bash
 
+whoami
+pwd
 echo "Hello World"
-env'''
+env
+'''
       }
     }
 
