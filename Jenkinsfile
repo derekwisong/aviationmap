@@ -9,5 +9,16 @@ echo "Hello World"'''
       }
     }
 
+    stage('Python Setup') {
+      steps {
+        sh '''#!/bin/bash
+
+date
+pwd
+
+python -m venv env'''
+      }
+    }
+
   }
 }
