@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
         name="avwx_map",
-        version="0.0.1",
+        version=read('VERSION'),
         author="Derek Wisong",
         author_email="derek@wisong.net",
         description="An aviation weather map",
@@ -16,5 +16,12 @@ setup(
         keywords="aviation weather map led vfr metar",
         packages=['avwx', 'ledvfrmap'],
         scripts=['map2.py'],
-        data_files=['config.yml']
+        data_files=['config.yml'],
+        install_requires=['wheel',
+                          'rpi.gpio',
+                          'adafruit-ws2801',
+                          'requests',
+                          'pyyaml',
+                          'sqlalchemy'
+            ]
 )
