@@ -1,12 +1,5 @@
-# necessary for building
+# necessary for building and testing
 wheel
 setuptools
-
-# necessary for raspberry pi communication with LEDs
-#rpi.gpio
-#adafruit-ws2801
-
-# python packages required
-#requests
-#pyyaml
-#sqlalchemy
+nose
+coverage

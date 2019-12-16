@@ -8,3 +8,5 @@ data/
 *.egg-info
 build/
 dist/
+.coverage
+.eggs
