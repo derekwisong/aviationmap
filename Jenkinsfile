@@ -1,19 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('Test Step') {
-      steps {
-        sh '''#!/bin/bash
-
-whoami
-pwd
-echo "Hello World"
-env
-'''
-      }
-    }
-
-    stage('Python Setup') {
+    stage('Build') {
       steps {
         sh '''#!/bin/bash
 set -e
@@ -35,33 +23,29 @@ pip install -r requirements.txt
 
 python setup.py build sdist
 
-# Install package
+# Install package into test environment
 
 python setup.py install
 
-# Write out path to source distribution
-
-DISTFILE="dist/avwx_map-$(head -n 1 VERSION).tar.gz"
-echo "$DISTFILE" > DISTFILE
 
 '''
       }
     }
 
-    stage('Create Tarball') {
+    stage('Test') {
       steps {
-        sh '''#!/bin/bash
-
-tar cvzf avwx_map.tar.gz env/ map2.py config.yml
-ls -lh'''
+        sh 'python setup.py nosetests'
       }
     }
 
     stage('Deploy') {
       steps {
-        sh '''#!/bin/bash
-
-scp avwx_map.tar.gz map@ledvfrmap:builds/'''
+        sh '''tar cvzf avwx-$(cat VERSION).tar.gz \\
+    config.yml \\
+    map2.py \\
+    dist/avwx_map-$(cat VERSION).tar.gz
+'''
+        sh 'scp tar avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'
       }
     }
 
