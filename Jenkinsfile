@@ -34,7 +34,8 @@ python setup.py install
 
     stage('Test') {
       steps {
-        sh 'python setup.py nosetests'
+        sh '''source env/bin/activate
+python setup.py nosetests'''
       }
     }
 
