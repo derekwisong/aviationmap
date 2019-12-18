@@ -63,16 +63,7 @@ TARBALL="avwx-$VERSION.tar.gz"
 ssh $REMOTE "mkdir -p $DIR"
 scp $TARBALL $REMOTE:$DIR
 
-ssh $REMOTE "
-  cd $DIR
-  python -m venv env
-  souce env/bin/activate
-  tar xf $TARBALL
-  cd dist
-  tar xf avwx_map-$VERSION.tar.gz
-  cd avwx_map-$VERSION
-  python setup.py install
-"'''
+ssh $REMOTE "cd $DIR && python -m venv env && souce env/bin/activate && tar xf $TARBALL && cd dist && tar xf avwx_map-$VERSION.tar.gz && cd avwx_map-$VERSION && python setup.py install"'''
       }
     }
 
