@@ -54,7 +54,25 @@ tar cvzf avwx-$(cat VERSION).tar.gz \\
     dist/avwx_map-$(cat VERSION).tar.gz
 '''
         sh '''#!/bin/bash
-scp avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'''
+VERSION=$(cat VERSION)
+REMOTE=map@ledvfrmap
+NAME=avwx-$VERSION
+DIR="builds/$NAME"
+TARBALL="avwx-$VERSION.tar.gz"
+
+ssh $REMOTE "mkdir -p $DIR"
+scp $TARBALL $REMOTE:$DIR
+
+ssh $REMOTE "
+  cd $DIR
+  python -m venv env
+  souce env/bin/activate
+  tar xf $TARBALL
+  cd dist
+  tar xf avwx_map-$VERSION.tar.gz
+  cd avwx_map-$VERSION
+  python setup.py install
+"'''
       }
     }
 
