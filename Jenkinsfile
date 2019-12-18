@@ -10,25 +10,28 @@ set -e
 
 PYENV_HOME=env
 
-if [ -d $PYENV_HOME ]
+if [ -d env ]
 then
-    rm -rf $PYENV_HOME
+    rm -rf env
 fi
 
-python3 -m venv $PYENV_HOME
+python3 -m venv env
 
-# Build distribution
-source $PYENV_HOME/bin/activate
+# Prepare environment
+
+source env/bin/activate
 pip install -r requirements.txt
+
+
+
+'''
+        sh '''source env/bin/activate
 
 python setup.py build sdist
 
 # Install package into test environment
 
-python setup.py install
-
-
-'''
+python setup.py install'''
       }
     }
 
