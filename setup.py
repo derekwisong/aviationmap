@@ -16,7 +16,7 @@ setup(
         keywords="aviation weather map led vfr metar",
         packages=['avwx', 'ledvfrmap'],
         scripts=['map2.py'],
-        data_files=['config.yml'],
+        data_files=['config.yml', 'VERSION'],
         install_requires=['wheel',
                           'rpi.gpio',
                           'adafruit-ws2801',
