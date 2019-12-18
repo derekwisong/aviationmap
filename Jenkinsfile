@@ -68,7 +68,7 @@ set -e
 source ~/venv/map/bin/activate
 cd $DIR
 python -m venv env
-souce env/bin/activate
+source env/bin/activate
 tar xf $TARBALL
 cd dist
 tar xf avwx_map-$VERSION.tar.gz
