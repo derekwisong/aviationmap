@@ -149,7 +149,12 @@ class ConsoleLedController(LedController):
 class RaspberryPiLedController(LedController):
     def __init__(self, leds, clock_pin, data_pin, clear=True):
         LedController.__init__(self, leds)
-        import Adafruit_WS2801
+        
+        try:
+            import Adafruit_WS2801
+        except:
+            raise
+
         self.pixels = Adafruit_WS2801.WS2801Pixels(len(leds),
                                                    clk=clock_pin,
                                                    do=data_pin)
