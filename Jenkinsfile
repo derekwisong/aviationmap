@@ -25,7 +25,8 @@ pip install -r requirements.txt
 
 
 '''
-        sh '''source env/bin/activate
+        sh '''#!/bin/bash
+source env/bin/activate
 
 python setup.py build sdist
 
@@ -37,19 +38,23 @@ python setup.py install'''
 
     stage('Test') {
       steps {
-        sh '''source env/bin/activate
+        sh '''#!/bin/bash
+source env/bin/activate
 python setup.py nosetests'''
       }
     }
 
     stage('Deploy') {
       steps {
-        sh '''tar cvzf avwx-$(cat VERSION).tar.gz \\
+        sh '''#!/bin/bash
+
+tar cvzf avwx-$(cat VERSION).tar.gz \\
     config.yml \\
     map2.py \\
     dist/avwx_map-$(cat VERSION).tar.gz
 '''
-        sh 'scp tar avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'
+        sh '''#!/bin/bash
+scp tar avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'''
       }
     }
 
