@@ -1,39 +1,41 @@
-#!/usr/bin/env python
-
-from ledvfrmap.map import LedMap
+import ledvfrmap.map as map
 
 import logging
-import threading
+import os
 import time
-import json
-import yaml
 
-import argparse
-parser = argparse.ArgumentParser(description="LED VFR Map")
-parser.add_argument('--config', type=str, dest='config', default='config.yml',
-                    help="Configuration file path")
-parser.add_argument('--verbose', action='store_const', const=True,
-                    dest='verbose', help="Turn on verbose output")
-args = parser.parse_args()
+if __name__ == '__main__':
+    import argparse
 
-log_level = logging.DEBUG if args.verbose else logging.INFO
-log_format = '[%(asctime)s %(name)s %(levelname)s] %(message)s'
-logging.basicConfig(level=log_level,
-                    format=log_format)
-logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
 
+    parser = argparse.ArgumentParser(description="LED VFR Map")
+    parser.add_argument('-c', '--config', type=str, dest='config',
+                        default='config.yml',
+                        help="Configuration file")
+    parser.add_argument('-v', '--verbose', action='store_const', const=True,
+                        dest='verbose', default=False,
+                        help="Show more verbose logging output")
+    args = parser.parse_args()
 
-logger.info("Reading configuration")
-with open(args.config) as config_file:
-    config = yaml.load(config_file, Loader=yaml.Loader)
-    try:
-        map = LedMap(config)
-    except:
-        logger.exception("Problem loading map")
+    logfmt = "[%(levelname)s %(asctime)s %(module)s %(threadName)s] %(message)s"
+    level = logging.INFO
+
+    if args.verbose:
+        level = logging.DEBUG
+
+    logging.basicConfig(format=logfmt, level=level)
+
+    if not os.path.exists(args.config):
+        logger.error("Config file {} does not exist".format(args.config))
         exit(1)
-try:
+
+    map = map.LedMap(args.config)
+
     while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    logger.info("Stopping map...")
+        try:
+            time.sleep(0.5)
+        except KeyboardInterrupt:
+            break
+    
     map.stop()
