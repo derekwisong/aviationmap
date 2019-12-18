@@ -54,7 +54,7 @@ tar cvzf avwx-$(cat VERSION).tar.gz \\
     dist/avwx_map-$(cat VERSION).tar.gz
 '''
         sh '''#!/bin/bash
-scp tar avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'''
+scp avwx-$(cat VERSION).tar.gz map@ledvfrmap:builds/'''
       }
     }
 
