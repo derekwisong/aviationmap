@@ -62,6 +62,7 @@ cd /app
 mkdir -p src
 mv $FILENAME src/
 ENVNAME="$VERSION_$(date +\'%Y%m%dT%H%M%S\')"
+echo "ENVNAME is \'$ENVNAME\'"
 source ~/venv/map/bin/activate
 python -m venv $ENVNAME
 source $ENVNAME/bin/activate
