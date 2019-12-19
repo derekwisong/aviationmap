@@ -1,10 +1,9 @@
 [Unit]
-Description=LED VFR Map
+Description=LED Aviation Map
 After=network.target
 
 [Service]
-ExecStart=python -u main.py
-WorkingDirectory=/home/map/src/avwx
+ExecStart=/app/current/bin/ledmap
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
