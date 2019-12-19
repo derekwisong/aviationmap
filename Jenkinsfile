@@ -53,6 +53,7 @@ NAME="avwx_map-$VERSION"
 FILENAME="$NAME.tar.gz"
 DIR="/app/$VERSION"
 TARBALL="dist/$FILENAME"
+ENVNAME="$VERSION_$(date +\'%Y%m%dT%H%M%S\')"
 
 scp $TARBALL $REMOTE:/app
 
@@ -61,7 +62,6 @@ set -e
 cd /app
 mkdir -p src
 mv $FILENAME src/
-ENVNAME="$VERSION_$(date +\'%Y%m%dT%H%M%S\')"
 echo "ENVNAME is \'$ENVNAME\'"
 source ~/venv/map/bin/activate
 python -m venv $ENVNAME
