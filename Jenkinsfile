@@ -47,13 +47,6 @@ python setup.py nosetests'''
     stage('Deploy') {
       steps {
         sh '''#!/bin/bash
-
-tar cvzf avwx-$(cat VERSION).tar.gz \\
-    config.yml \\
-    map2.py \\
-    dist/avwx_map-$(cat VERSION).tar.gz
-'''
-        sh '''#!/bin/bash
 VERSION=$(head -n 1 VERSION)
 REMOTE=map@ledvfrmap
 NAME="avwx_map-$VERSION"
