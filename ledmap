@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 import ledvfrmap.map as map
-
+from pkg_resources import resource_filename
 import logging
 import os
 import time
@@ -11,7 +12,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="LED VFR Map")
     parser.add_argument('-c', '--config', type=str, dest='config',
-                        default='config.yml',
+                        default=resource_filename('ledvfrmap', 'config.yml'),
                         help="Configuration file")
     parser.add_argument('-v', '--verbose', action='store_const', const=True,
                         dest='verbose', default=False,

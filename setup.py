@@ -3,7 +3,7 @@ from setuptools import setup
 
 def read(fname):
     with open(os.path.join(os.path.dirname(__file__), fname)) as handle:
-        return handle.read()
+        return handle.read().strip()
 
 setup(
         name="avwx_map",
@@ -13,10 +13,10 @@ setup(
         description="An aviation weather map",
         long_description=read('README.md'),
         license="GPL",
-        keywords="aviation weather map led vfr metar",
+        keywords=["aviation", "weather", "map", "led", "vfr", "metar"],
         packages=['avwx', 'ledvfrmap'],
-        scripts=['map.py'],
-        data_files=[('',['config.yml', 'VERSION', 'README.md'])],
+        scripts=['ledmap'],
+        data_files=[('ledvfrmap', ['ledvfrmap/config.yml', 'VERSION', 'README.md'])],
         install_requires=['wheel',
                           'rpi.gpio',
                           'adafruit-ws2801',
