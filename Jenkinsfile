@@ -61,15 +61,18 @@ set -e
 cd /app
 mkdir -p src
 mv $FILENAME src/
+ENVNAME="$VERSION_$(date +\'%Y%m%dT%H%M%S\')"
 source ~/venv/map/bin/activate
-python -m venv $VERSION
-source $VERSION/bin/activate
+python -m venv $ENVNAME
+source $ENVNAME/bin/activate
 cd src
 tar xf $FILENAME
 cd $NAME
 python setup.py install
 cd ..
 rm -r $NAME
+cd /app
+[ -s current ] && (rm current && ln -s $ENVNAME current)
 EOF'''
       }
     }
