@@ -53,7 +53,7 @@ NAME="avwx_map-$VERSION"
 FILENAME="$NAME.tar.gz"
 DIR="/app/$VERSION"
 TARBALL="dist/$FILENAME"
-ENVNAME="$VERSION_$(date +\'%Y%m%dT%H%M%S\')"
+ENVNAME="${VERSION}_$(date +\'%Y%m%dT%H%M%S\')"
 
 scp $TARBALL $REMOTE:/app
 
