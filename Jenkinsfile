@@ -47,33 +47,36 @@ python setup.py nosetests'''
     stage('Deploy') {
       steps {
         sh '''#!/bin/bash
-
-tar cvzf avwx-$(cat VERSION).tar.gz \\
-    config.yml \\
-    map2.py \\
-    dist/avwx_map-$(cat VERSION).tar.gz
-'''
-        sh '''#!/bin/bash
-VERSION=$(cat VERSION)
+VERSION=$(head -n 1 VERSION)
 REMOTE=map@ledvfrmap
-NAME=avwx-$VERSION
-DIR="builds/$NAME"
-TARBALL="avwx-$VERSION.tar.gz"
+NAME="avwx_map-$VERSION"
+FILENAME="$NAME.tar.gz"
+DIR="/app/$VERSION"
+TARBALL="dist/$FILENAME"
+ENVNAME="${VERSION}_$(date +\'%Y%m%dT%H%M%S\')"
 
-ssh $REMOTE "mkdir -p $DIR"
-scp $TARBALL $REMOTE:$DIR
+scp $TARBALL $REMOTE:/app
 
 ssh $REMOTE bash <<EOF
 set -e
+cd /app
+mkdir -p src
+mv $FILENAME src/
+echo "ENVNAME is \'$ENVNAME\'"
 source ~/venv/map/bin/activate
-cd $DIR
-python -m venv env
-source env/bin/activate
-tar xf $TARBALL
-cd dist
-tar xf avwx_map-$VERSION.tar.gz
-cd avwx_map-$VERSION
+python -m venv $ENVNAME
+source $ENVNAME/bin/activate
+cd src
+tar xf $FILENAME
+cd $NAME
 python setup.py install
+cd ..
+ls
+echo "NAME=$NAME"
+rm -r $NAME
+cd /app
+[ -s current ] && rm current
+ln -s $ENVNAME current
 EOF'''
       }
     }
