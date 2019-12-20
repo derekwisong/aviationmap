@@ -71,9 +71,12 @@ tar xf $FILENAME
 cd $NAME
 python setup.py install
 cd ..
+ls
+echo "NAME=$NAME"
 rm -r $NAME
 cd /app
-[ -s current ] && (rm current && ln -s $ENVNAME current)
+[ -s current ] && rm current
+ln -s $ENVNAME current
 EOF'''
       }
     }
