@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ledvfrmap.map as map
+import ledvfrmap.map
 from pkg_resources import resource_filename
 import logging
 import os
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         logger.error("Config file {} does not exist".format(args.config))
         exit(1)
 
-    map = map.LedMap(args.config)
+    map = ledvfrmap.map.LedMap(args.config)
 
     while True:
         try:
