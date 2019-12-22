@@ -23,5 +23,6 @@ setup(
                           'requests',
                           'pyyaml',
                           'sqlalchemy'
+                          'flask'
             ]
 )
