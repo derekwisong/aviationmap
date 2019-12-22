@@ -22,7 +22,7 @@ setup(
                           'adafruit-ws2801',
                           'requests',
                           'pyyaml',
-                          'sqlalchemy'
+                          'sqlalchemy',
                           'flask'
             ]
 )
