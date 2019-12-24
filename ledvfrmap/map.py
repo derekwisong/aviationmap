@@ -104,6 +104,14 @@ class LedController:
         self.leds = leds
         self._state = {}
 
+    def off(self):
+        for led in self.leds:
+            led.off()
+
+    def on(self):
+        for led in self.leds:
+            led.on()
+
     def update_led(self, led):
         new_color = led.color.rgb()
         new_state = led.is_on()
@@ -337,6 +345,12 @@ class LedMap:
 
 
         self._airports = airports
+
+    def on(self):
+        self._led_controller.on()
+
+    def off(self):
+        self._led_controller.off()
 
     def stop(self):
         self._data.stop()

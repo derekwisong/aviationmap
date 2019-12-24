@@ -6,8 +6,24 @@ import os
 import time
 import signal
 import sys
+from flask import Flask
 
 map = None
+app = Flask(__name__)
+
+@app.route("/map/off")
+def map_off():
+    logger = logging.getLogger(__name__)
+    logger.info("Request to turn map off")
+    map.off()
+    return "OFF"
+
+@app.route("/map/on")
+def map_on():
+    logger = logging.getLogger(__name__)
+    logger.info("Request to turn map on")
+    map.on()
+    return "ON"
 
 def terminate(signal_number, frame):
     if map:
@@ -28,6 +44,11 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_const', const=True,
                         dest='verbose', default=False,
                         help="Show more verbose logging output")
+    parser.add_argument('-d', '--debug', action='store_const', const=True,
+                        dest='debug', default=False,
+                        help="Run Flask server in debug mode")
+    parser.add_argument('-p', '--port', type=int, default=9999,
+                        help='Port for web server to listen on')
     args = parser.parse_args()
 
     logfmt = "[%(levelname)s %(asctime)s %(module)s %(threadName)s] %(message)s"
@@ -43,11 +64,6 @@ if __name__ == '__main__':
         exit(1)
 
     map = ledvfrmap.map.LedMap(args.config)
-
-    while True:
-        try:
-            time.sleep(0.5)
-        except KeyboardInterrupt:
-            break
+    app.run(debug=args.debug, port=9999, host='0.0.0.0')
     
     map.stop()
