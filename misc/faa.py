@@ -5,6 +5,14 @@ import pandas as pd
 
 dimensions_re = re.compile(r"([0-9]+) +ft\.[ \n]+x ([0-9]+) ft.")
 
+def condense_string(string):
+    """Condense multiple spaces into one"""
+    return ' '.join(string.split())
+
+def coords_to_dec(degrees, minutes, seconds):
+    """Convert gps coords to degrees"""
+    return degrees + (minutes/60) + (seconds/3600)
+
 class Airport:
     def __init__(self, identifier, session=None):
         self.identifier = identifier
@@ -23,6 +31,27 @@ class Airport:
 
         self.res = res
         self.soup = BeautifulSoup(res.text, 'html.parser')
+
+    def normalize_coords(self, coordinates):
+        lat_str, lon_str = coordinates.split("/")
+        parse = lambda x:[float(_) for _ in x.split()[0].split('-')]
+        return (coords_to_dec(*parse(lat_str)), coords_to_dec(*parse(lon_str)))
+
+    def summary(self):
+        summary = self.soup.find('div', {'id': 'summary'})
+        details = {}
+
+        for row in summary.find_all('tr'):
+            if not row: continue
+            cells = row.find_all('td')
+            if not cells: continue
+            field = condense_string(cells[0].text)
+            val = condense_string(cells[1].text)
+            details[field] = val
+
+        details['coords'] = self.normalize_coords(details['Latitude/Longitude'])
+        return details
+
 
     def runways(self, to_df=False):
         id_filter = lambda x:x and x.startswith("runway_")
