@@ -1,6 +1,6 @@
-display: flight_category
-controller: rpi
-database: sqlite:////data/ledvfrmap.db
+display: traffic
+controller: console
+database: sqlite:////tmp/ledvfrmap.db
 rpi:
   button:
     bounce_time: 500

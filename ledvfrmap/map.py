@@ -5,13 +5,18 @@ LedController should run a timer that checks each LED
 and updates the displayed color.
 """
 
+import json
 import threading
 import logging
+import pkg_resources
 import yaml
 import time
 import os
 
+from collections import defaultdict
+
 from . import data
+from . import geo
 
 class Color:
     def __init__(self, r, g, b):
@@ -69,6 +74,8 @@ class Airport:
         self._metar = {}
         self._lock = threading.RLock()
         self.neighbors = []
+        self.latitude = None
+        self.longitude = None
     
     @property
     def led(self):
@@ -94,6 +101,9 @@ class Airport:
                 return self.metar[item]
             except KeyError:
                 return None
+
+    def distance(self, latitude, longitude):
+        return geo.haversine(self.longitude, self.latitude, longitude, latitude, miles=True)
 
     def __str__(self):
         return self.icao_id
@@ -217,6 +227,63 @@ class LedDisplay(threading.Thread):
     def led_controller(self, controller):
         self._led_controller = controller
 
+class OpenSkyTrafficDisplay(LedDisplay):
+    def __init__(self, airports):
+        LedDisplay.__init__(self, airports, data, name="OpenSkyTrafficDisplay")
+        self.opensky = data.OpenSkyData()
+        self.states = None
+        self.aircraft_overhead = defaultdict(int)
+
+    def update_traffic_data(self):
+        self.states = self.opensky.get_states()
+        self.calculate_traffic_stats()
+
+    def closest_airport(self, longitude, latitude, limit=100):
+        min_distance = None
+        closest = None
+
+        for airport in self._airports:
+            dist = airport.distance(latitude, longitude)
+            if min_distance is None or dist < min_distance:
+                closest = airport
+                min_distance = dist
+
+        return (closest, min_distance)
+
+    def calculate_traffic_stats(self):
+        aircraft_overhead = defaultdict(int)
+
+        for state in self.states:
+            closest_airport, distance = self.closest_airport(state['longitude'],
+                                                             state['latitude'])
+            if distance <= 100:
+                aircraft_overhead[closest_airport.icao_id] += 1
+
+        self.aircraft_overhead = aircraft_overhead
+
+    def get_traffic_color(self, code):
+        aircraft = self.aircraft_overhead[code]
+        print(f"There are {aircraft} aircraft over {code}")
+        #TODO: calculate a gradient value
+        return Color(0, 255, 0)
+
+    def update(self):
+        logger = logging.getLogger(__name__)
+        self.update_traffic_data()
+        changed = False
+        for airport in self._airports:
+
+            airport.led.color = self.get_traffic_color(airport.icao_id)
+            changed |= self.led_controller.update_led(airport.led)
+
+        self.led_controller.show()
+
+    def run(self):
+        self.update()
+
+        while not self._stopped.wait(60):
+            self.update()
+
 class FlightCategoryDisplay(LedDisplay):
     cat_colors = {'VFR': Color(0, 1, 0),
                   'MVFR': Color(0, 0, 1),
@@ -298,6 +365,29 @@ class FlightCategoryDisplay(LedDisplay):
         while not self._stopped.wait(5):
             self.update()
 
+def get_airports(config):
+    airports = {}
+    static_data_file = pkg_resources.resource_filename(__name__, 'data.json')
+    with open(static_data_file, 'r') as cfg:
+        static_data = json.load(cfg)
+
+    for airport_info in config['stations']:
+        code = airport_info['code']
+        data = static_data[code]
+        led = Led(airport_info['led'], name=code)
+        airport = Airport(code, led)
+        airport.latitude = data['latitude']
+        airport.longitude = data['longitude']
+        airports[code] = airport
+
+    for airport_info in config['stations']:
+        code = airport_info['code']
+        airport = airports[code]
+        if 'neighbors' in airport_info:
+            airport.neighbors = [airports[neighbor] for neighbor in airport_info['neighbors']]
+
+    return airports
+
 class LedMap:
     def __init__(self, config_file):
         self._display = None
@@ -328,23 +418,9 @@ class LedMap:
             raise Exception("Unknown LED controller: {}".format(controller))
 
     def _setup_airports(self):
-        airports = {}
-
-        for airport_info in self.config['stations']:
-            code = airport_info['code']
-            led = Led(airport_info['led'], name=code)
-            airport = Airport(code, led)
-            airports[code] = airport
+        self._airports = get_airports(self.config)
+        for airport in self._airports.values():
             self._data.add_airport(airport)
-
-        for airport_info in self.config['stations']:
-            code = airport_info['code']
-            airport = airports[code]
-            if 'neighbors' in airport_info:
-                airport.neighbors = [airports[neighbor] for neighbor in airport_info['neighbors']]
-
-
-        self._airports = airports
 
     def on(self):
         self._led_controller.on()
@@ -367,6 +443,8 @@ class LedMap:
             if display == 'flight_category':
                 gust_level = int(self.config['modes']['flight_category']['gust_pulse'])
                 self._display = FlightCategoryDisplay(self.airports.values(), self._data, gust_alert=gust_level)
+            elif display == 'traffic':
+                self._display = OpenSkyTrafficDisplay(self.airports.values())
             else:
                 raise Exception("Unknown display: {}".format(self.config['display']))
         else:
