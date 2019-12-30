@@ -8,7 +8,6 @@ import avwx.tds
 import time
 
 from . import db
-from . import geo
 
 class Data:
     def __init__(self, database_conn_str):
