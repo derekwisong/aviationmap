@@ -17,36 +17,43 @@ class KDTree:
 
     def __init__(self):
         self.root = None
+        self.key = lambda x: x
         self.dimensions = None
 
     @staticmethod
-    def from_points(points, dimensions=None):
+    def from_points(points, dimensions=None, key=lambda x: x):
         """Build a KDTree from a list of points"""
         if not points:
             return
 
         tree = KDTree()
-        tree.dimensions = dimensions if dimensions else len(points[0])
-        tree.root = KDTree._nodes_from_points(points, tree.dimensions)
+        tree.key = key
+        tree.dimensions = dimensions if dimensions else len(key(points[0]))
+        tree.root = KDTree._nodes_from_points(points, tree.dimensions, key=key)
 
         return tree
 
     @staticmethod
-    def _nodes_from_points(points, dimensions, depth=0):
+    def _nodes_from_points(points, dimensions, key=lambda x: x, depth=0):
         """Build the Node structure recursively from points"""
         if not points:
             return
 
         axis = depth % dimensions
-        points.sort(key=lambda x: x[axis])
+
+        def getter(x):
+            val = key(x)
+            return val[axis]
+
+        points.sort(key=getter)
         median = len(points) // 2
 
         return Node(
             axis=axis,
             value=points[median],
-            split=points[median][axis],
-            left=KDTree._nodes_from_points(points[:median], dimensions, depth=depth + 1),
-            right=KDTree._nodes_from_points(points[median + 1:], dimensions, depth=depth + 1)
+            split=key(points[median])[axis],
+            left=KDTree._nodes_from_points(points[:median], dimensions, key=key, depth=depth + 1),
+            right=KDTree._nodes_from_points(points[median + 1:], dimensions, key=key, depth=depth + 1)
         )
 
     def nearest(self, point):
@@ -57,9 +64,10 @@ class KDTree:
 
         while stack:
             check_opposite, node = stack.pop()
+            node_val = self.key(node.value)
 
             if not check_opposite:
-                dist = distance(node.value, point)
+                dist = distance(node_val, point)
 
                 if not closest or dist < closest_distance:
                     closest_distance = dist
@@ -84,4 +92,4 @@ class KDTree:
                         stack.append((True, node.right))
                         stack.append((False, node.right))
 
-        return closest_distance, closest
+        return closest_distance, closest.value
