@@ -9,6 +9,7 @@ import time
 
 from . import db
 
+
 class Data:
     def __init__(self, database_conn_str):
         self.airports = set()
@@ -26,6 +27,7 @@ class Data:
     def stop(self):
         self.metar_monitor.stop()
         self.metar_monitor.join()
+
 
 class MetarMonitor(threading.Thread):
     def __init__(self, database):
@@ -58,8 +60,8 @@ class MetarMonitor(threading.Thread):
             logger.error("Timeout while getting METAR data")
         except requests.exceptions.ConnectionError:
             logger.error("Unable to connect to METAR data source")
-        except:
-            logger.exception("Problem handling METAR data")
+        except requests.exceptions.RequestException:
+            logger.exception("Problem requesting METAR data")
 
     def run(self):
         self.update()
@@ -70,12 +72,13 @@ class MetarMonitor(threading.Thread):
     def stop(self):
         self.stopped.set()
 
+
 class OpenSkyData:
     def __init__(self):
         from opensky_api import OpenSkyApi
         self.api = OpenSkyApi()
         # bounding box around the USA
-        self.bbox = (23.346528, 50.579747, -128.466799,-64.262697)
+        self.bbox = (23.346528, 50.579747, -128.466799, -64.262697)
         self.states = []
 
     def get_states(self):
@@ -109,15 +112,3 @@ class OpenSkyData:
                 states.append(datum)
 
         return states
-
-# https://app.swaggerhub.com/apis/FAA/ASWS/1.1.0
-
-# This returns JSON with status information for KATL
-# https://soa.smext.faa.gov/asws/api/airport/status/KATL
-
-# This returns delay information
-# https://soa.smext.faa.gov/asws/api/airport/delays
-# url = "https://soa.smext.faa.gov/asws/api/airport/delays"                                                                                                                              
-# requests.get(url, headers={'accept':'application/json'}).text                                                                                                                          
-# '{"status":{"code":200,"info":"OK","count":0},"GroundDelays":{"groundDelay":[],"count":0},"GroundStops":{"groundStop":[],"count":0},"ArriveDepartDelays":{"arriveDepart":[],"count":0},"Closures":{"closure":[],"count":0}}'
-

@@ -2,10 +2,12 @@ import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Float, String, Text, DateTime, Sequence
+from sqlalchemy import Column, Integer, Float, String, Text, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = declarative_base()
+
+
 class Metar(Base):
     __tablename__ = 'metar'
     station_id = Column(String(4), primary_key=True)
@@ -39,6 +41,7 @@ class Metar(Base):
     elevation_m = Column(Float)
     raw_text = Column(Text)
     raw_xml = Column(Text)
+
 
 class Database:
     def __init__(self, connection_string):

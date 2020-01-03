@@ -3,33 +3,39 @@ import ledvfrmap.map
 from pkg_resources import resource_filename
 import logging
 import os
-import time
 import signal
 import sys
 from flask import Flask
 
-map = None
+aviation_map = None
 app = Flask(__name__)
+
 
 @app.route("/map/off")
 def map_off():
-    logger = logging.getLogger(__name__)
-    logger.info("Request to turn map off")
-    map.off()
+    log = logging.getLogger(__name__)
+    log.info("Request to turn map off")
+    aviation_map.off()
     return "OFF"
+
 
 @app.route("/map/on")
 def map_on():
-    logger = logging.getLogger(__name__)
-    logger.info("Request to turn map on")
-    map.on()
+    log = logging.getLogger(__name__)
+    log.info("Request to turn map on")
+    aviation_map.on()
     return "ON"
 
+
 def terminate(signal_number, frame):
-    if map:
-        map.stop()
+    log = logging.getLogger(__name__)
+    log.info(f"Received signal {signal_number} at {frame}")
+
+    if aviation_map:
+        aviation_map.stop()
     
     sys.exit()
+
 
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, terminate)
@@ -63,7 +69,7 @@ if __name__ == '__main__':
         logger.error("Config file {} does not exist".format(args.config))
         exit(1)
 
-    map = ledvfrmap.map.LedMap(args.config)
+    aviation_map = ledvfrmap.map.LedMap(args.config)
     app.run(debug=args.debug, port=9999, host='0.0.0.0')
     
-    map.stop()
+    aviation_map.stop()

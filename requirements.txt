@@ -1,4 +1,7 @@
-# necessary for building and testing
+flask
+sqlalchemy
+requests
+PyYAML
 wheel
 setuptools
 nose

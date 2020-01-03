@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import Adafruit_WS2801
-import Adafruit_GPIO.SPI as SPI
+# import Adafruit_GPIO.SPI as SPI
 import threading
 import logging
 import time
@@ -10,8 +10,10 @@ is_setup = False
 BUTTON_SHORT_PRESS = 0
 BUTTON_LONG_PRESS = 1
 
+
 class RaspberryPiException(Exception):
     pass
+
 
 def setup(mode="BCM"):
     global is_setup
@@ -24,6 +26,7 @@ def setup(mode="BCM"):
         raise ValueError("Unknown mode: {}".format(mode))
 
     is_setup = True
+
 
 class Button:
     def __init__(self, led_map, pin, pull="DOWN", long_press_time=5.0, bouncetime=300):
@@ -72,6 +75,7 @@ class Button:
         else:
             logger.info("Button pressed quickly: {}".format(button_time))
 
+
 class LEDController(threading.Thread):
     def __init__(self, pixel_count, clock_pin, data_pin, clear=True):
         threading.Thread.__init__(self)
@@ -83,8 +87,8 @@ class LEDController(threading.Thread):
             self.pixels.show()
 
         self.pixel_count = pixel_count
-        self.pixel_color = {i:(0, 0, 0) for i in range(pixel_count)}
-        self.pixel_state = {i:True for i in range(pixel_count)}
+        self.pixel_color = {i: (0, 0, 0) for i in range(pixel_count)}
+        self.pixel_state = {i: True for i in range(pixel_count)}
         self.changed = False
         self.stopped = threading.Event()
         self.lock = threading.Lock()
@@ -140,8 +144,6 @@ class LEDController(threading.Thread):
         return self.pixels.get_pixel_rgb(pixel_number)
         
     def run(self):
-        logger = logging.getLogger(__name__)
-
         while not self.stopped.wait(0.1):
             self.lock.acquire()
             try:

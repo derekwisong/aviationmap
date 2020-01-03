@@ -7,10 +7,11 @@ the Text Data Server (TDS)
 
 import requests
 import logging
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree
 import datetime
 
 TDS = 'https://www.aviationweather.gov/adds/dataserver_current/httpparam'
+
 
 def item_timestamp(item, fmt="%Y-%m-%dT%H:%M:%SZ"):
     try:
@@ -20,11 +21,13 @@ def item_timestamp(item, fmt="%Y-%m-%dT%H:%M:%SZ"):
     except ValueError:
         return None
 
+
 def item_text(item):
     try:
         return item.text.strip()
     except AttributeError:
         return None
+
 
 def item_float(item):
     try:
@@ -36,6 +39,7 @@ def item_float(item):
     except TypeError:
         return None
 
+
 def item_int(item):
     try:
         return int(item.text)
@@ -46,20 +50,22 @@ def item_int(item):
     except TypeError:
         return None
 
+
 def item_attrib(item):
     try:
         return item.attrib
     except AttributeError:
         return None
 
+
 def parse_xml_metar(xml_data):
-    root = ET.fromstring(xml_data)
+    root = xml.etree.ElementTree.fromstring(xml_data)
     stations = {}
     for metar in root.iter('METAR'):
-        id = metar.find('station_id').text
+        station_id = metar.find('station_id').text
         sky = item_attrib(metar.find('sky_condition'))
         data = {
-            'station_id': id,
+            'station_id': station_id,
             'raw_text': item_text(metar.find('raw_text')),
             'observation_time': item_timestamp(metar.find('observation_time')),
             'latitude': item_float(metar.find('latitude')),
@@ -86,20 +92,21 @@ def parse_xml_metar(xml_data):
             'snow_in': item_float(metar.find('snow_in')),
             'vert_vis_ft': item_int(metar.find('vert_vis_ft')),
             'metar_type': item_text(metar.find('metar_type')),
-            'raw_xml': ET.tostring(metar)
+            'raw_xml': xml.etree.ElementTree.tostring(metar)
         }
         try:
             data['cloud_base_ft_agl'] = float(sky['cloud_base_ft_agl'])
-        except:
+        except (KeyError, ValueError):
             data['cloud_base_ft_agl'] = None
         try:
             data['sky_cover'] = sky['sky_cover']
-        except:
+        except KeyError:
             data['sky_cover'] = None
 
-        stations[id] = data
+        stations[station_id] = data
 
     return stations
+
 
 def get_latest_metar(stations, timeout=20.0):
     logger = logging.getLogger(__name__)
@@ -118,6 +125,7 @@ def get_latest_metar(stations, timeout=20.0):
     else:
         raise RuntimeError("Unable to retreive METAR")
 
+
 def get_flight_categories(stations):
     """
     Get flight categories (VFR, MVFR, IFR, LIFR) for a list of stations.
@@ -125,5 +133,5 @@ def get_flight_categories(stations):
     """
 
     metars = get_latest_metar(stations)
-    categories = {station: v.get('category') for station,v in metars.items()}
+    categories = {station: v.get('category') for station, v in metars.items()}
     return categories
