@@ -20,8 +20,8 @@ setup(
         install_requires=['wheel',
                           'rpi.gpio',
                           'adafruit-ws2801',
-                          'requests',
                           'pyyaml',
                           'sqlalchemy',
-                          'flask'            ]
+                          'flask',
+                          'requests']
 )
