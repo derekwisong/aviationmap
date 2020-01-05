@@ -1,0 +1,781 @@
+brightness:
+  maximum: 100.0
+  minimum: 0.0
+  schedule:
+    00:00: 20.0
+    06:00: 40.0
+    07:00: 60.0
+    '11:00': 100.0
+    '18:00': 60.0
+    '20:00': 40.0
+controller: console
+database: sqlite:////data/ledvfrmap.db
+display: flight_category
+modes:
+  flight_category:
+    gust_pulse: 10
+  wind:
+    gust_pulse: 10
+rpi:
+  button:
+    bounce_time: 500
+    long_press_time: 5000
+    pin: 4
+    pull: DOWN
+  clock_pin: 11
+  data_pin: 10
+  gpio_mode: BCM
+stations:
+- code: KSAN
+  latitude: 32.733555555555554
+  led: 0
+  longitude: -117.18966666666667
+  name: SAN DIEGO INTL
+- code: KNYL
+  latitude: 32.656573888888886
+  led: 1
+  longitude: -114.60598722222221
+  name: YUMA MCAS/YUMA INTL
+- code: KPHX
+  latitude: 33.43427777777777
+  led: 2
+  longitude: -112.01158333333333
+  name: PHOENIX SKY HARBOR INTL
+- code: KTUS
+  latitude: 32.11606916666667
+  led: 3
+  longitude: -110.94101388888889
+  name: TUCSON INTL
+- code: KDMN
+  latitude: 32.262388888888886
+  led: 4
+  longitude: -107.71900000000001
+  name: DEMING MUNI
+- code: KELP
+  latitude: 31.807333333333332
+  led: 5
+  longitude: -106.37636111111111
+  name: EL PASO INTL
+- code: KROW
+  latitude: 33.299869666666666
+  led: 6
+  longitude: -104.5293976388889
+  name: ROSWELL INTL AIR CENTER
+- code: KABQ
+  latitude: 35.03893155555556
+  led: 7
+  longitude: -106.60826216666666
+  name: ALBUQUERQUE INTL SUNPORT
+- code: KFMN
+  latitude: 36.74125
+  led: 8
+  longitude: -108.22994444444444
+  name: FOUR CORNERS RGNL
+- code: KASE
+  latitude: 39.22188888888889
+  led: 9
+  longitude: -106.86822222222222
+  name: ASPEN-PITKIN CO/SARDY FIELD
+- code: KCYS
+  latitude: 41.15563888888889
+  led: 10
+  longitude: -104.81047222222222
+  name: CHEYENNE RGNL/JERRY OLSON FIELD
+- code: KDEN
+  latitude: 39.861666666666665
+  led: 11
+  longitude: -104.67316666666667
+  name: DENVER INTL
+- code: KGLD
+  latitude: 39.3706275
+  led: 12
+  longitude: -101.69898472222222
+  name: RENNER FLD /GOODLAND MUNI/
+- code: KHQG
+  latitude: 37.16308333333333
+  led: 13
+  longitude: -101.37052777777777
+  name: HUGOTON MUNI
+- code: KAMA
+  latitude: 35.21936111111111
+  led: 14
+  longitude: -101.70591666666667
+  name: RICK HUSBAND AMARILLO INTL
+- code: KLBB
+  latitude: 33.663666666666664
+  led: 15
+  longitude: -101.82055555555556
+  name: LUBBOCK PRESTON SMITH INTL
+- code: KMAF
+  latitude: 31.942527777777777
+  led: 16
+  longitude: -102.20191666666668
+  name: MIDLAND INTL AIR AND SPACE PORT
+- code: KFST
+  latitude: 30.91525
+  led: 17
+  longitude: -102.91277777777778
+  name: FORT STOCKTON-PECOS COUNTY
+- code: KSJT
+  latitude: 31.357750000000003
+  led: 18
+  longitude: -100.49630555555555
+  name: SAN ANGELO RGNL/MATHIS FIELD
+- code: KDRT
+  latitude: 29.374206944444445
+  led: 19
+  longitude: -100.92715694444445
+  name: DEL RIO INTL
+- code: KLRD
+  latitude: 27.544194444444447
+  led: 20
+  longitude: -99.46158333333334
+  name: LAREDO INTL
+- code: KCRP
+  latitude: 27.772194444444445
+  led: 21
+  longitude: -97.50241666666666
+  name: CORPUS CHRISTI INTL
+- code: KAUS
+  latitude: 30.194527222222224
+  led: 22
+  longitude: -97.66987611111112
+  name: AUSTIN-BERGSTROM INTL
+- code: KIAH
+  latitude: 29.984435277777777
+  led: 23
+  longitude: -95.3414425
+  name: GEORGE BUSH INTERCONTINENTAL/HOUSTON
+- code: KLCH
+  latitude: 30.126083333333334
+  led: 24
+  longitude: -93.22341666666667
+  name: LAKE CHARLES RGNL
+- code: KSHV
+  latitude: 32.44661111111111
+  led: 25
+  longitude: -93.8256111111111
+  name: SHREVEPORT RGNL
+- code: KLIT
+  latitude: 34.72944444444445
+  led: 26
+  longitude: -92.22477777777777
+  name: BILL AND HILLARY CLINTON NATIONAL/ADAMS FIELD
+- code: KMLU
+  latitude: 32.51086111111111
+  led: 27
+  longitude: -92.03766666666667
+  name: MONROE RGNL
+- code: KLFT
+  latitude: 30.205027777777776
+  led: 28
+  longitude: -91.98775
+  name: LAFAYETTE RGNL/PAUL FOURNET FIELD
+- code: KMSY
+  latitude: 29.993277777777777
+  led: 29
+  longitude: -90.25902777777777
+  name: LOUIS ARMSTRONG NEW ORLEANS INTL
+- code: KGPT
+  latitude: 30.407277777777775
+  led: 30
+  longitude: -89.07008333333333
+  name: GULFPORT-BILOXI INTL
+- code: KJAN
+  latitude: 32.311166666666665
+  led: 31
+  longitude: -90.07588888888888
+  name: JACKSON-MEDGAR WILEY EVERS INTL
+- code: KGWO
+  latitude: 33.49330894444444
+  led: 32
+  longitude: -90.08667741666666
+  name: GREENWOOD-LEFLORE
+- code: KMEM
+  latitude: 35.04241138888889
+  led: 33
+  longitude: -89.97667916666667
+  name: MEMPHIS INTL
+- code: KPAH
+  latitude: 37.06028833333333
+  led: 34
+  longitude: -88.77295916666667
+  name: BARKLEY RGNL
+- code: KSTL
+  latitude: 38.748697222222226
+  led: 35
+  longitude: -90.37002888888888
+  name: ST LOUIS LAMBERT INTL
+- code: KBMI
+  latitude: 40.477111111111114
+  led: 36
+  longitude: -88.91591666666667
+  name: CENTRAL IL RGNL ARPT AT BLOOMINGTON-NORMAL
+- code: KIND
+  latitude: 39.717305555555555
+  led: 37
+  longitude: -86.29463888888888
+  name: INDIANAPOLIS INTL
+- code: KLEX
+  latitude: 38.03675
+  led: 38
+  longitude: -84.60863888888888
+  name: BLUE GRASS
+- code: KBNA
+  latitude: 36.124472222222224
+  led: 39
+  longitude: -86.67816666666667
+  name: NASHVILLE INTL
+- code: KBHM
+  latitude: 33.56388888888888
+  led: 40
+  longitude: -86.75230555555555
+  name: BIRMINGHAM-SHUTTLESWORTH INTL
+- code: KMGM
+  latitude: 32.300638888888884
+  led: 41
+  longitude: -86.39397222222223
+  name: MONTGOMERY RGNL (DANNELLY FIELD)
+- code: KPNS
+  latitude: 30.473416666666665
+  led: 42
+  longitude: -87.18661111111112
+  name: PENSACOLA INTL
+- code: KECP
+  latitude: 30.35825
+  led: 43
+  longitude: -85.79561111111111
+  name: NORTHWEST FLORIDA BEACHES INTL
+- code: KTLH
+  latitude: 30.396754166666668
+  led: 44
+  longitude: -84.35086888888888
+  name: TALLAHASSEE INTL
+- code: KOCF
+  latitude: 29.17187677777778
+  led: 45
+  longitude: -82.22411463888889
+  name: OCALA INTL-JIM TAYLOR FIELD
+- code: KTPA
+  latitude: 27.97547222222222
+  led: 46
+  longitude: -82.53325
+  name: TAMPA INTL
+- code: KFMY
+  latitude: 26.58661111111111
+  led: 47
+  longitude: -81.86325
+  name: PAGE FIELD
+- code: KEYW
+  latitude: 24.556119722222224
+  led: 48
+  longitude: -81.75995583333334
+  name: KEY WEST INTL
+- code: KMIA
+  latitude: 25.795361111111113
+  led: 49
+  longitude: -80.29011583333333
+  name: MIAMI INTL
+- code: MYNN
+  latitude: 25.039114444444447
+  led: 50
+  longitude: -77.46636769444444
+  name: LYNDEN PINDLING INTL
+- code: MYGF
+  latitude: 26.55868611111111
+  led: 51
+  longitude: -78.69555277777778
+  name: GRAND BAHAMA INTL
+- code: KPBI
+  latitude: 26.683161666666667
+  led: 52
+  longitude: -80.09559194444444
+  name: PALM BEACH INTL
+- code: KMCO
+  latitude: 28.42938888888889
+  led: 53
+  longitude: -81.309
+  name: ORLANDO INTL
+- code: KJAX
+  latitude: 30.494055555555555
+  led: 54
+  longitude: -81.68783333333333
+  name: JACKSONVILLE INTL
+- code: KABY
+  latitude: 31.53552777777778
+  led: 55
+  longitude: -84.19447222222223
+  name: SOUTHWEST GEORGIA RGNL
+- code: KATL
+  latitude: 33.63669961111111
+  led: 56
+  longitude: -84.427864
+  name: HARTSFIELD - JACKSON ATLANTA INTL
+- code: KCHA
+  latitude: 35.03519444444444
+  led: 57
+  longitude: -85.20355555555555
+  name: LOVELL FIELD
+- code: KTYS
+  latitude: 35.809373861111105
+  led: 58
+  longitude: -83.99532144444444
+  name: MC GHEE TYSON
+- code: KCLT
+  latitude: 35.213750000000005
+  led: 59
+  longitude: -80.94905555555556
+  name: CHARLOTTE/DOUGLAS INTL
+- code: KAGS
+  latitude: 33.36994444444444
+  led: 60
+  longitude: -81.9645
+  name: AUGUSTA RGNL AT BUSH FIELD
+- code: KSAV
+  latitude: 32.127583333333334
+  led: 61
+  longitude: -81.2021388888889
+  name: SAVANNAH/HILTON HEAD INTL
+- code: KCHS
+  latitude: 32.89863888888889
+  led: 62
+  longitude: -80.04052777777778
+  name: CHARLESTON AFB/INTL
+- code: KMYR
+  latitude: 33.679741111111106
+  led: 63
+  longitude: -78.92832138888889
+  name: MYRTLE BEACH INTL
+- code: KEWN
+  latitude: 35.07285252777778
+  led: 64
+  longitude: -77.04302008333333
+  name: COASTAL CAROLINA REGIONAL
+- code: KRDU
+  latitude: 35.87763888888889
+  led: 65
+  longitude: -78.78747222222222
+  name: RALEIGH-DURHAM INTL
+- code: KORF
+  latitude: 36.89460416666667
+  led: 66
+  longitude: -76.20122916666666
+  name: NORFOLK INTL
+- code: KIAD
+  latitude: 38.94744444444444
+  led: 67
+  longitude: -77.45994444444445
+  name: WASHINGTON DULLES INTL
+- code: KDOV
+  latitude: 39.12953888888889
+  led: 68
+  longitude: -75.46596111111111
+  name: DOVER AFB
+- code: KPHL
+  latitude: 39.87208388888889
+  led: 69
+  longitude: -75.24066305555556
+  name: PHILADELPHIA INTL
+- code: KEWR
+  latitude: 40.69247983333333
+  led: 70
+  longitude: -74.16868677777778
+  name: NEWARK LIBERTY INTL
+- code: KJFK
+  latitude: 40.63992777777778
+  led: 71
+  longitude: -73.7786925
+  name: JOHN F KENNEDY INTL
+- code: KHPN
+  latitude: 41.066952750000006
+  led: 72
+  longitude: -73.70756655555556
+  name: WESTCHESTER COUNTY
+- code: KISP
+  latitude: 40.796135694444445
+  led: 73
+  longitude: -73.10066505555555
+  name: LONG ISLAND MAC ARTHUR
+- code: KGON
+  latitude: 41.33005555555556
+  led: 74
+  longitude: -72.04513888888889
+  name: GROTON-NEW LONDON
+- code: KHFD
+  latitude: 41.73672222222223
+  led: 75
+  longitude: -72.64944444444446
+  name: HARTFORD-BRAINARD
+- code: KMVY
+  latitude: 41.393422055555554
+  led: 76
+  longitude: -70.61388413888888
+  name: MARTHA'S VINEYARD
+- code: KBOS
+  latitude: 42.362944444444445
+  led: 77
+  longitude: -71.00638888888889
+  name: GENERAL EDWARD LAWRENCE LOGAN INTL
+- code: KPWM
+  latitude: 43.6456435
+  led: 78
+  longitude: -70.3086163611111
+  name: PORTLAND INTL JETPORT
+- code: KBGR
+  latitude: 44.80744444444444
+  led: 79
+  longitude: -68.82813888888889
+  name: BANGOR INTL
+- code: KLEB
+  latitude: 43.626111111111115
+  led: 80
+  longitude: -72.30419444444445
+  name: LEBANON MUNI
+- code: KBTV
+  latitude: 44.471955
+  led: 81
+  longitude: -73.15327611111111
+  name: BURLINGTON INTL
+- code: KALB
+  latitude: 42.74911111111111
+  led: 82
+  longitude: -73.80197222222222
+  name: ALBANY INTL
+- code: KSWF
+  latitude: 41.50411111111111
+  led: 83
+  longitude: -74.10483333333333
+  name: NEW YORK STEWART INTL
+- code: KAVP
+  latitude: 41.33847222222222
+  led: 84
+  longitude: -75.72338888888889
+  name: WILKES-BARRE/SCRANTON INTL
+- code: KSYR
+  latitude: 43.11119444444444
+  led: 85
+  longitude: -76.10630555555555
+  name: SYRACUSE HANCOCK INTL
+- code: KBUF
+  latitude: 42.940416666666664
+  led: 86
+  longitude: -78.73058333333333
+  name: BUFFALO NIAGARA INTL
+- code: KUNV
+  latitude: 40.85
+  led: 87
+  longitude: -77.84758333333333
+  name: UNIVERSITY PARK
+- code: KPIT
+  latitude: 40.491416666666666
+  led: 88
+  longitude: -80.23269444444445
+  name: PITTSBURGH INTL
+- code: KCKB
+  latitude: 39.29765472222222
+  led: 89
+  longitude: -80.22753194444445
+  name: NORTH CENTRAL WEST VIRGINIA
+- code: KROA
+  latitude: 37.325472222222224
+  led: 90
+  longitude: -79.97541666666667
+  name: ROANOKE-BLACKSBURG RGNL/WOODRUM FIELD
+- code: KCRW
+  latitude: 38.37601263888889
+  led: 91
+  longitude: -81.59289288888888
+  name: YEAGER
+- code: KCVG
+  latitude: 39.048836666666666
+  led: 92
+  longitude: -84.66782222222223
+  name: CINCINNATI/NORTHERN KENTUCKY INTL
+- code: KCMH
+  latitude: 39.996947222222225
+  led: 93
+  longitude: -82.89216111111112
+  name: JOHN GLENN COLUMBUS INTL
+- code: KCLE
+  latitude: 41.409416666666665
+  led: 94
+  longitude: -81.85469444444443
+  name: CLEVELAND-HOPKINS INTL
+- code: KDTW
+  latitude: 42.21244444444445
+  led: 95
+  longitude: -83.35338888888889
+  name: DETROIT METROPOLITAN WAYNE COUNTY
+- code: KMKG
+  latitude: 43.16767172222222
+  led: 96
+  longitude: -86.23543872222223
+  name: MUSKEGON COUNTY
+- code: KORD
+  latitude: 41.97452194444445
+  led: 97
+  longitude: -87.90659722222223
+  name: CHICAGO O'HARE INTL
+- code: KGRB
+  latitude: 44.484633611111114
+  led: 98
+  longitude: -88.12971333333333
+  name: GREEN BAY-AUSTIN STRAUBEL INTL
+- code: KEAU
+  latitude: 44.86580555555555
+  led: 99
+  longitude: -91.48425
+  name: CHIPPEWA VALLEY RGNL
+- code: KDLH
+  latitude: 46.84206975
+  led: 100
+  longitude: -92.19323722222222
+  name: DULUTH INTL
+- code: KMSP
+  latitude: 44.881972222222224
+  led: 101
+  longitude: -93.22177777777777
+  name: MINNEAPOLIS-ST PAUL INTL/WOLD-CHAMBERLAIN
+- code: KCMY
+  latitude: 43.95829355555556
+  led: 102
+  longitude: -90.73793552777778
+  name: SPARTA/FORT MC COY
+- code: KMLI
+  latitude: 41.448277777777776
+  led: 103
+  longitude: -90.50752777777778
+  name: QUAD CITY INTL
+- code: KDSM
+  latitude: 41.53397222222222
+  led: 104
+  longitude: -93.66308333333333
+  name: DES MOINES INTL
+- code: KMCI
+  latitude: 39.29761111111111
+  led: 105
+  longitude: -94.71388888888889
+  name: KANSAS CITY INTL
+- code: KSGF
+  latitude: 37.245666666666665
+  led: 106
+  longitude: -93.38863888888889
+  name: SPRINGFIELD-BRANSON NATIONAL
+- code: KFYV
+  latitude: 36.00508333333333
+  led: 107
+  longitude: -94.17005555555556
+  name: DRAKE FIELD
+- code: KTXK
+  latitude: 33.453722222222225
+  led: 108
+  longitude: -93.99102777777777
+  name: TEXARKANA RGNL-WEBB FIELD
+- code: KDFW
+  latitude: 32.89723155555556
+  led: 109
+  longitude: -97.03769494444444
+  name: DALLAS-FORT WORTH INTL
+- code: KOKC
+  latitude: 35.39307402777778
+  led: 110
+  longitude: -97.60076172222222
+  name: WILL ROGERS WORLD
+- code: KTUL
+  latitude: 36.198388888888886
+  led: 111
+  longitude: -95.88811111111112
+  name: TULSA INTL
+- code: KICT
+  latitude: 37.64994444444444
+  led: 112
+  longitude: -97.43305555555555
+  name: WICHITA DWIGHT D EISENHOWER NATIONAL
+- code: KSLN
+  latitude: 38.79061111111111
+  led: 113
+  longitude: -97.65222222222222
+  name: SALINA RGNL
+- code: KGRI
+  latitude: 40.9675425
+  led: 114
+  longitude: -98.30963888888888
+  name: CENTRAL NEBRASKA RGNL
+- code: KOMA
+  latitude: 41.30316666666666
+  led: 115
+  longitude: -95.89405555555557
+  name: EPPLEY AIRFIELD
+- code: KFSD
+  latitude: 43.582013333333336
+  led: 116
+  longitude: -96.7419163888889
+  name: JOE FOSS FIELD
+- code: KMOX
+  latitude: 45.56599555555555
+  led: 117
+  longitude: -95.96719333333334
+  name: MORRIS MUNI - CHARLIE SCHMIDT FLD
+- code: KFAR
+  latitude: 46.92063888888889
+  led: 118
+  longitude: -96.81575
+  name: HECTOR INTL
+- code: KGFK
+  latitude: 47.94727777777778
+  led: 119
+  longitude: -97.17377777777779
+  name: GRAND FORKS INTL
+- code: KMOT
+  latitude: 48.25763888888889
+  led: 120
+  longitude: -101.27802777777778
+  name: MINOT INTL
+- code: KBWW
+  latitude: 46.165519305555556
+  led: 121
+  longitude: -103.30074275
+  name: BOWMAN RGNL
+- code: KRAP
+  latitude: 44.04533333333333
+  led: 122
+  longitude: -103.0573611111111
+  name: RAPID CITY RGNL
+- code: KGCC
+  latitude: 44.34891666666667
+  led: 123
+  longitude: -105.5393611111111
+  name: GILLETTE-CAMPBELL COUNTY
+- code: KBIL
+  latitude: 45.80784913888888
+  led: 124
+  longitude: -108.54354355555556
+  name: BILLINGS LOGAN INTL
+- code: KHLN
+  latitude: 46.606722222222224
+  led: 125
+  longitude: -111.98327777777779
+  name: HELENA RGNL
+- code: KGPI
+  latitude: 48.3105
+  led: 126
+  longitude: -114.256
+  name: GLACIER PARK INTL
+- code: KGEG
+  latitude: 47.61902777777778
+  led: 127
+  longitude: -117.53522222222222
+  name: SPOKANE INTL
+- code: KYKM
+  latitude: 46.56816666666667
+  led: 128
+  longitude: -120.54405555555556
+  name: YAKIMA AIR TERMINAL/MCALLISTER FIELD
+- code: KSEA
+  latitude: 47.449888888888886
+  led: 129
+  longitude: -122.31177777777778
+  name: SEATTLE-TACOMA INTL
+- code: KPDX
+  latitude: 45.588708861111115
+  led: 130
+  longitude: -122.59686941666666
+  name: PORTLAND INTL
+- code: KEUG
+  latitude: 44.124583333333334
+  led: 131
+  longitude: -123.21197222222223
+  name: MAHLON SWEET FIELD
+- code: KMFR
+  latitude: 42.37422222222222
+  led: 132
+  longitude: -122.87349999999999
+  name: ROGUE VALLEY INTL - MEDFORD
+- code: KRDD
+  latitude: 40.50897222222222
+  led: 133
+  longitude: -122.29338888888888
+  name: REDDING MUNI
+- code: KSAC
+  latitude: 38.512861111111114
+  led: 134
+  longitude: -121.49330027777778
+  name: SACRAMENTO EXECUTIVE
+- code: KSFO
+  latitude: 37.618805555555554
+  led: 135
+  longitude: -122.37541666666667
+  name: SAN FRANCISCO INTL
+- code: KFAT
+  latitude: 36.776555555555554
+  led: 136
+  longitude: -119.71883333333334
+  name: FRESNO YOSEMITE INTL
+- code: KSBP
+  latitude: 35.23727777777778
+  led: 137
+  longitude: -120.64261111111112
+  name: SAN LUIS COUNTY RGNL
+- code: KLAX
+  latitude: 33.942496388888884
+  led: 138
+  longitude: -118.40804861111111
+  name: LOS ANGELES INTL
+- code: KPSP
+  latitude: 33.82966666666667
+  led: 139
+  longitude: -116.50669444444445
+  name: PALM SPRINGS INTL
+- code: KLAS
+  latitude: 36.080043888888895
+  led: 140
+  longitude: -115.15223472222223
+  name: MC CARRAN INTL
+- code: KGCN
+  latitude: 35.95236111111112
+  led: 141
+  longitude: -112.14697222222223
+  name: GRAND CANYON NATIONAL PARK
+- code: KMLF
+  latitude: 38.42663558333333
+  led: 142
+  longitude: -113.013274
+  name: MILFORD MUNI/BEN AND JUDY BRISCOE FIELD
+- code: KSLC
+  latitude: 40.78839333333333
+  led: 143
+  longitude: -111.97777333333333
+  name: SALT LAKE CITY INTL
+- code: KPIH
+  latitude: 42.90980555555556
+  led: 144
+  longitude: -112.59591666666667
+  name: POCATELLO RGNL
+- code: KJAC
+  latitude: 43.60733333333334
+  led: 145
+  longitude: -110.73775
+  name: JACKSON HOLE
+- code: KSUN
+  latitude: 43.50378055555556
+  led: 146
+  longitude: -114.29555833333333
+  name: FRIEDMAN MEMORIAL
+- code: KTWF
+  latitude: 42.48180555555556
+  led: 147
+  longitude: -114.48775
+  name: JOSLIN FIELD - MAGIC VALLEY RGNL
+- code: KBAM
+  latitude: 40.59905555555556
+  led: 148
+  longitude: -116.87433333333333
+  name: BATTLE MOUNTAIN
+  neighbors:
+  - KRNO
+  - KTWF
+- code: KRNO
+  latitude: 39.49911111111111
+  led: 149
+  longitude: -119.76811111111111
+  name: RENO/TAHOE INTL
