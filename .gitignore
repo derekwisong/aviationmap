@@ -4,6 +4,7 @@ __pycache__/
 ledvfrmap.db
 data/
 .ipynb_checkpoints/
+venv/
 
 *.egg-info
 build/
