@@ -54,7 +54,7 @@ def item_attrib(item):
 
 def parse_xml_metar(xml_data):
     root = ET.fromstring(xml_data)
-    stations = {}
+    stations = []
     for metar in root.iter('METAR'):
         id = metar.find('station_id').text
         sky = item_attrib(metar.find('sky_condition'))
@@ -97,24 +97,35 @@ def parse_xml_metar(xml_data):
         except:
             data['sky_cover'] = None
 
-        stations[id] = data
+        stations.append(data)
 
     return stations
 
 def get_latest_metar(stations, timeout=20.0):
     logger = logging.getLogger(__name__)
     logger.info("Requesting latest METAR data")
+
+    station_string = stations if isinstance(stations, str) else ",".join(stations)
+
     opts = {'datasource': 'metars',
             'requestType': 'retrieve',
             'format': 'xml',
-            'stationString': ",".join(stations),
+            'stationString': station_string,
             'mostRecentForEachStation': 'constraint',
             'hoursBeforeNow': '3.0'}
 
     response = requests.get(TDS, params=opts, timeout=timeout)
     
     if response.status_code == 200:
-        return parse_xml_metar(response.text)
+        metars = parse_xml_metar(response.text)
+
+        if isinstance(stations, str):
+            if metars:
+                return metars[0]
+            else:
+                return None
+
+        return metars
     else:
         raise RuntimeError("Unable to retreive METAR")
 

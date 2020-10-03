@@ -1,4 +1,5 @@
 # necessary for building and testing
+requests
 wheel
 setuptools
 nose
