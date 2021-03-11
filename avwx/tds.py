@@ -103,7 +103,7 @@ def parse_xml_metar(xml_data):
 
 def get_latest_metar(stations, timeout=20.0):
     logger = logging.getLogger(__name__)
-    logger.info("Requesting latest METAR data")
+    logger.debug("Requesting latest METAR data")
     opts = {'datasource': 'metars',
             'requestType': 'retrieve',
             'format': 'xml',

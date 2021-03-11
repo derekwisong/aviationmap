@@ -1,1 +1,0 @@
-rsync -azv -e 'ssh -A -J home.wisong.net' map@ledvfrmap:src/avwx/ledvfrmap.db .

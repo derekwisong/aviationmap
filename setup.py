@@ -7,22 +7,19 @@ def read(fname):
 
 setup(
         name="avwx_map",
-        version=read('VERSION'),
+        version=read('ledmap/VERSION'),
         author="Derek Wisong",
         author_email="derek@wisong.net",
         description="An aviation weather map",
         long_description=read('README.md'),
         license="GPL",
         keywords=["aviation", "weather", "map", "led", "vfr", "metar"],
-        packages=['avwx', 'ledvfrmap'],
-        scripts=['ledmap'],
-        data_files=[('ledvfrmap', ['ledvfrmap/config.yml', 'VERSION', 'README.md'])],
+        packages=['avwx', 'ledmap'],
+        entry_points={'console_scripts':['ledmap=ledmap.map:main']},
+        package_data={'ledmap': ["config.yml"]},
         install_requires=['wheel',
                           'rpi.gpio',
                           'adafruit-ws2801',
                           'requests',
-                          'pyyaml',
-                          'sqlalchemy',
-                          'flask'
-            ]
+                          'pyyaml']
 )
