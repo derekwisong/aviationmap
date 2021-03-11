@@ -1,5 +1,5 @@
 ---
-frequency: 10
+frequency: 60
 loglevel: info
 rpi:
   clock_pin: 11
