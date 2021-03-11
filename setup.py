@@ -6,17 +6,17 @@ def read(fname):
         return handle.read().strip()
 
 setup(
-        name="avwx_map",
-        version=read('ledmap/VERSION'),
+        name="aviationmap",
+        version=read('avmap/VERSION'),
         author="Derek Wisong",
         author_email="derek@wisong.net",
         description="An aviation weather map",
         long_description=read('README.md'),
         license="GPL",
         keywords=["aviation", "weather", "map", "led", "vfr", "metar"],
-        packages=['avwx', 'ledmap'],
-        entry_points={'console_scripts':['ledmap=ledmap.map:main']},
-        package_data={'ledmap': ["config.yml"]},
+        packages=['avwx', 'avmap'],
+        entry_points={'console_scripts':['avmap=avmap.map:main']},
+        package_data={'avmap': ["config.yml"]},
         install_requires=['wheel',
                           'rpi.gpio',
                           'adafruit-ws2801',
