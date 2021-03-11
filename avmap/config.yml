@@ -1,5 +1,6 @@
 ---
 frequency: 10
+loglevel: info
 rpi:
   clock_pin: 11
   data_pin: 10

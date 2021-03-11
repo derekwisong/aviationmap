@@ -1,4 +1,6 @@
 import logging
+import signal
+import threading
 import time
 import yaml
 
@@ -105,6 +107,7 @@ class RaspberryPiLedController(LedController):
             self.pixels.set_pixel_rgb(led, *color)
 
         self.pixels.show()
+        time.sleep(1)
 
 def load_config(config_file):
     """Load configuration file"""
@@ -147,10 +150,47 @@ def update(controller: LedController, stations):
     # tell the LED controller to display the new colors
     controller.show()
 
-def main():
-    logging.basicConfig(level=logging.INFO)
-    config = load_config(config_file)
+class SignalReceiver:
+    """
+    SignalReceiver is used to trap signals to enable clean shutdown.
+    """
+    def __init__(self, signals=None):
+        """
+        Create a SignalReceiver
+        signals: Signal numbers to trap. If None, SIGINT and SIGTERM are used
+        """
+        self._event = threading.Event()
 
+        for signum in signals if signals else [signal.SIGINT, signal.SIGTERM]:
+            signal.signal(signum, self._handle)
+
+    @property
+    def signaled(self):
+        """
+        Return true if a signal was received
+        """
+        return self._event.is_set()
+    
+    def wait(self, delay):
+        """
+        Sleep until delay seconds have passed or a signal is received.
+        delay: Maximum number of seconds to wait
+        Returns true if a signal was received during the wait
+        """
+        return self._event.wait(delay)
+
+    def _handle(self, signum, frame):
+        """
+        Handle receiving a signal
+        """
+        logger.debug(f"Received signal {signum}")
+        self._event.set()
+
+def main():
+    config = load_config(config_file)
+    loglevel = logging.INFO if config['loglevel'] == 'info' else logging.DEBUG
+    logging.basicConfig(level=loglevel)
+    
     stations = config['stations']
     leds = [_['led'] for _ in stations]
 
@@ -162,12 +202,15 @@ def main():
     except NotRaspberryPiException:
         controller = LedController(leds)
 
-    try:
-        while True:
-            update(controller, stations)
-            time.sleep(config['frequency'])
-    except KeyboardInterrupt:
-        logging.debug("Interrupt from keyboard")
+    signal_receiver = SignalReceiver()
+
+    while not signal_receiver.signaled:
+        update(controller, stations)
+        signal_receiver.wait(config['frequency'])
+    
+    # now that the program is ending, clear the map and wait a second
+    controller.clear()
+    time.sleep(1)
 
 if __name__ == '__main__':
     main()
