@@ -63,7 +63,7 @@ if __name__ == '__main__':
         logger.error("Config file {} does not exist".format(args.config))
         exit(1)
 
-    map = ledvfrmap.map.LedMap(args.config)
+    map = ledvfrmap.map.SimpleLedMap(args.config)
     app.run(debug=args.debug, port=9999, host='0.0.0.0')
     
     map.stop()

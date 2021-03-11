@@ -299,7 +299,7 @@ class FlightCategoryDisplay(LedDisplay):
             self.update()
 
 class LedMap:
-    def __init__(self, config_file):
+    def __init__(self, config_file, display=True):
         self._display = None
         self._airports = {}
         self._led_controller = None
@@ -312,7 +312,8 @@ class LedMap:
         self._setup_led_controller()
 
         self._data.start()
-        self.set_display(self.config['display'])
+        if display:
+            self.set_display(self.config['display'])
 
     def _setup_led_controller(self):
         leds = [airport.led for airport in self.airports.values()]
@@ -354,8 +355,11 @@ class LedMap:
 
     def stop(self):
         self._data.stop()
-        self._display.stop()
-        self._display.join()
+
+        if self._display is not None:
+            self._display.stop()
+            self._display.join()
+
         self._led_controller.clear()
 
     def set_display(self, display):
@@ -386,3 +390,10 @@ class LedMap:
     @property
     def led_controller(self):
         return self._led_controller
+
+
+class SimpleLedMap(LedMap):
+    def set_display(self, display):
+        logging.info(f"Set display: {display}")
+        for airport in self.airports:
+            logging.info(f"Airport: {airport}")
