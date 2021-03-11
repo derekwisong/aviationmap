@@ -19,7 +19,9 @@ setup(
         package_data={'avmap': ["config.yml"]},
         install_requires=['wheel',
                           'rpi.gpio',
-                          'adafruit-ws2801',
+                          'adafruit-circuitpython-busdevice',
+                          'adafruit-circuitpython-lis3dh',
+                          'adafruit-circuitpython-ws2801',
                           'requests',
                           'pyyaml']
 )

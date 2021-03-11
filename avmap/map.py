@@ -75,15 +75,17 @@ class RaspberryPiLedController(LedController):
         data_pin: GPIO pin that the data pin on the WS2801 connects to
         """
         super().__init__(leds)
-        import Adafruit_WS2801
-        
         try:
-            self.pixels = Adafruit_WS2801.WS2801Pixels(len(leds),
-                                                       clk=clock_pin,
-                                                       do=data_pin)
-        except RuntimeError:
-            raise NotRaspberryPiException("Unable to load Adafruit_WS2801.")
-                                                   
+            import board
+        except NotImplementedError:
+            raise NotRaspberryPiException("Device is not a Raspberry Pi")
+        else:
+            if not board.board_id.startswith("RASPBERRY_PI"):
+                raise NotRaspberryPiException("Device is not a Raspberry Pi")
+
+        from adafruit_ws2801 import WS2801
+        pin = lambda x: getattr(board, f"D{x}")
+        self.pixels = WS2801(pin(clock_pin), pin(data_pin), len(leds), brightness=1.0)
 
         # clear previously displayed colors from the WS2801
         self.clear()
