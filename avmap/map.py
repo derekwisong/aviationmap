@@ -190,7 +190,7 @@ def main():
     config = load_config(config_file)
     loglevel = logging.INFO if config['loglevel'] == 'info' else logging.DEBUG
     logging.basicConfig(level=loglevel)
-    
+
     stations = config['stations']
     leds = [_['led'] for _ in stations]
 
@@ -210,6 +210,7 @@ def main():
     
     # now that the program is ending, clear the map and wait a second
     controller.clear()
+    controller.show()
     time.sleep(1)
 
 if __name__ == '__main__':
