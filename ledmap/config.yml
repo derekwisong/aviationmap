@@ -1,30 +1,8 @@
-display: flight_category
-controller: rpi
-database: sqlite:////data/ledvfrmap.db
+---
+frequency: 10
 rpi:
-  button:
-    bounce_time: 500
-    long_press_time: 5000
-    pin: 4
-    pull: DOWN
   clock_pin: 11
   data_pin: 10
-  gpio_mode: BCM
-modes:
-  flight_category:
-    gust_pulse: 10
-  wind:
-    gust_pulse: 10
-brightness: 
-  maximum: 100.0
-  minimum: 0.0
-  schedule:
-    "00:00": 20.0
-    "06:00": 40.0
-    "07:00": 60.0
-    "11:00": 100.0
-    "18:00": 60.0
-    "20:00": 40.0
 stations:
 - code: KSAN
   led: 0
