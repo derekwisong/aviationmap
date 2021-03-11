@@ -111,12 +111,20 @@ def get_latest_metar(stations, timeout=20.0):
             'mostRecentForEachStation': 'constraint',
             'hoursBeforeNow': '3.0'}
 
-    response = requests.get(TDS, params=opts, timeout=timeout)
-    
+    try:
+        response = requests.get(TDS, params=opts, timeout=timeout)
+    except requests.exceptions.ConnectTimeout:
+        raise RuntimeError("Timeout while retreiving METAR data")
+    except requests.exceptions.RequestException:
+        raise RuntimeError("Unable to retrieve METAR data")
+
     if response.status_code == 200:
-        return parse_xml_metar(response.text)
+        try:
+            return parse_xml_metar(response.text)
+        except:
+            raise RuntimeError("Unable to parse METAR")
     else:
-        raise RuntimeError("Unable to retreive METAR")
+        raise RuntimeError(f"Invalid response from server: {response.status_code}")
 
 def get_flight_categories(stations):
     """

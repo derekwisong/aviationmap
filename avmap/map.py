@@ -138,15 +138,23 @@ def update(controller: LedController, stations):
     """
 
     # get METAR data
-    metars = get_latest_metar([_['code'] for _ in stations])
+    try:
+        metars = get_latest_metar([_['code'] for _ in stations])
+    except RuntimeError:
+        logging.exception("Unable to retrieve metar data")
 
     # translate METAR into color values
     for station in stations:
-        metar = metars[station['code']]
+        try:
+            metar = metars[station['code']]
+        except (NameError, KeyError) as e:
+            logging.error(f"Unable to set flight category for {station['name']}")
+            continue
+            
         color = get_category_color(metar)
         logger.debug(f"Setting {station['name']} ({station['code']}) to {color}")
         controller.set_led(station['led'], color)
-    
+
     # tell the LED controller to display the new colors
     controller.show()
 
