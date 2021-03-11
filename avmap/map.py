@@ -147,11 +147,11 @@ def update(controller: LedController, stations):
     for station in stations:
         try:
             metar = metars[station['code']]
+            color = get_category_color(metar)
         except (NameError, KeyError) as e:
             logging.error(f"Unable to set flight category for {station['name']}")
-            continue
-            
-        color = get_category_color(metar)
+            color = None
+
         logger.debug(f"Setting {station['name']} ({station['code']}) to {color}")
         controller.set_led(station['led'], color)
 
