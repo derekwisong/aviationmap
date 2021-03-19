@@ -18,7 +18,6 @@ setup(
         entry_points={'console_scripts':['avmap=avmap.map:main']},
         package_data={'avmap': ["config.yml"]},
         install_requires=['wheel',
-                          'rpi.gpio',
                           'adafruit-ws2801',
                           'requests',
                           'pyyaml']
