@@ -3,3 +3,11 @@ wheel
 setuptools
 nose
 coverage
+
+
+# new stuff
+flask
+adafruit-ws2801
+pyyaml
+RPi.GPIO
+requests
