@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 import argparse
 import logging
+import random
 
 from avmap.control import Api, Config
+from avmap.config import read_config
 
 logger = logging.getLogger(__name__)
 config = Config()
+cfg = read_config()
 api = Api(config.host, config.port)
+
 
 def set_color(args: argparse.Namespace):
     red, green, blue = map(int, str(args.color).split(",")[:3])
@@ -16,6 +20,29 @@ def set_color(args: argparse.Namespace):
         logger.info(f"Set color {args.station} to {color}")
     else:
         raise SystemExit("Failed to set color")
+
+
+class RandomMode():
+    def run(self):
+        for station in cfg["stations"]:
+            code = station["code"]
+            color = [random.randint(0, 255) for _ in range(3)]
+            api.set_color(code, color)
+            print(f"Setting {code} to {color}")
+        api.show()
+
+
+def mode_factory(name: str):
+    if name == "random":
+        return RandomMode()
+
+    raise ValueError(f"Unknown mode {name}")
+
+
+def activate_mode(args: argparse.Namespace):
+    mode = mode_factory(args.mode)
+    mode.run()
+
 
 def get_color(args: argparse.Namespace):
     color = api.get_color(args.station)
@@ -34,13 +61,16 @@ def set_config(args):
 def build_color_parser(parser: argparse.ArgumentParser) -> None:
     subparsers = parser.add_subparsers()
     set_parser = subparsers.add_parser("set", help="set color")
-    set_parser.add_argument("station", metavar="S", type=str, help="The station")
+    set_parser.add_argument("station", metavar="S",
+                            type=str, help="The station")
     set_parser.add_argument("color", metavar="C", type=str, help="The color")
-    set_parser.add_argument("--show", action="store_true", default=False, help="Show the updated color")
+    set_parser.add_argument("--show", action="store_true",
+                            default=False, help="Show the updated color")
     set_parser.set_defaults(func=set_color)
 
     get_parser = subparsers.add_parser("get", help="get color")
-    get_parser.add_argument("station", metavar="S", type=str, help="The station")
+    get_parser.add_argument("station", metavar="S",
+                            type=str, help="The station")
     get_parser.set_defaults(func=get_color)
 
 
@@ -65,12 +95,21 @@ def parse_args(args=None):
     config_parser = subparsers.add_parser("config", help="config commands")
     build_config_parser(config_parser)
 
+    mode_parser = subparsers.add_parser("mode")
+    mode_parser.add_argument("mode", metavar="M", help="mode name")
+    mode_parser.set_defaults(func=activate_mode)
+
+
     return parser.parse_args(args)
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
     args = parse_args()
+
+    if not hasattr(args, "func"):
+        parse_args(["--help"])
+
     args.func(args)
 
 
