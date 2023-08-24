@@ -32,15 +32,36 @@ class RandomMode():
         api.show()
 
 
-def mode_factory(name: str):
-    if name == "random":
-        return RandomMode()
+class OffMode():
+    def run(self):
+        for station in cfg["stations"]:
+            code = station["code"]
+            color = [0, 0, 0]
+            api.set_color(code, color)
+            print(f"Setting {code} to {color}")
+        api.show()
 
+
+MODES = {
+    "random": RandomMode,
+    "off": OffMode,
+}
+
+
+def mode_factory(name: str):
+    ModeClass = MODES.get(name)
+    if ModeClass:
+        return ModeClass()
     raise ValueError(f"Unknown mode {name}")
 
 
 def activate_mode(args: argparse.Namespace):
-    mode = mode_factory(args.mode)
+    if args.list:
+        print("Available modes:")
+        for name in sorted(MODES.keys()):
+            print(f"  {name}")
+        return
+    mode = mode_factory(args.name)
     mode.run()
 
 
@@ -85,6 +106,12 @@ def build_config_parser(parser: argparse.ArgumentParser) -> None:
     set_parser.set_defaults(func=set_config)
 
 
+def build_mode_parser(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--name", help="mode name")
+    parser.add_argument("--list", "-l", action="store_true", help="list modes")
+    parser.set_defaults(func=activate_mode)
+
+
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description="Aviation Map Controller")
     subparsers = parser.add_subparsers()
@@ -95,10 +122,8 @@ def parse_args(args=None):
     config_parser = subparsers.add_parser("config", help="config commands")
     build_config_parser(config_parser)
 
-    mode_parser = subparsers.add_parser("mode")
-    mode_parser.add_argument("mode", metavar="M", help="mode name")
-    mode_parser.set_defaults(func=activate_mode)
-
+    mode_parser = subparsers.add_parser("mode", help="Display a mode")
+    build_mode_parser(mode_parser)
 
     return parser.parse_args(args)
 
