@@ -5,9 +5,6 @@ $ flask run --host=0.0.0.0
 curl -w "\n" -X POST http://localhost:5000/station/KHPN/color -H 'Content-Type: application/json' -d '[100, 200, 153]'
 curl -w "\n" -X POST http://localhost:5000/show
 """
-
-import time
-
 from typing import Dict, List, Tuple
 
 from . import config
@@ -21,6 +18,7 @@ CLOCK_PIN = 11
 DATA_PIN = 10
 
 Color = Tuple[int, int, int]
+
 
 class Station:
     code: str = None
@@ -41,9 +39,9 @@ class StationIndex:
             station.led = s["led"]
 
             index._by_code[station.code] = station
-        
+
         return index
-    
+
     def get_station_names(self) -> List[str]:
         return [name for name in self._by_code.keys()]
 
@@ -58,14 +56,15 @@ class LightStrip:
     def __init__(self, length: int):
         assert length >= 0
         self.length = length
-        self.strip = Adafruit_WS2801.WS2801Pixels(length, clk=CLOCK_PIN, do=DATA_PIN)
+        self.strip = Adafruit_WS2801.WS2801Pixels(
+            length, clk=CLOCK_PIN, do=DATA_PIN)
         self.strip.clear()
         self.show()
-    
+
     def set(self, n: int, color: Color) -> None:
         assert 0 <= n < self.length
         self.strip.set_pixel_rgb(n, *color)
-    
+
     def get(self, n: int) -> Color:
         return self.strip.get_pixel_rgb(n)
 
@@ -84,12 +83,12 @@ class Map:
         self.strip.show()
 
 
-
 app = flask.Flask(__name__)
 cfg = config.read_config()
 index = StationIndex.from_config(cfg)
 strip = LightStrip(index.count())
 map = Map(strip)
+
 
 @app.route('/stations/color', methods=['GET', 'POST'])
 def station_colors():
@@ -126,6 +125,7 @@ def station_colors():
             colors[code] = color
         return flask.jsonify(colors)
 
+
 @app.route('/station/<code>/color', methods=['GET', 'POST'])
 def color(code):
     station = index.get_station(code)
@@ -147,6 +147,7 @@ def color(code):
     else:
         color = strip.get(station.led)
         return flask.jsonify(color)
+
 
 @app.route('/show', methods=['POST'])
 def show():

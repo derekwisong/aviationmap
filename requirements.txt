@@ -5,9 +5,13 @@ nose
 coverage
 
 
-# new stuff
+# dependencies
 flask
 adafruit-ws2801
 pyyaml
 RPi.GPIO
 requests
+
+
+# dev stuff
+jupyter
