@@ -8,7 +8,7 @@ curl -w "\n" -X POST http://localhost:5000/show
 
 import time
 
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 from . import config
 
@@ -44,6 +44,9 @@ class StationIndex:
         
         return index
     
+    def get_station_names(self) -> List[str]:
+        return [name for name in self._by_code.keys()]
+
     def get_station(self, code: str) -> Station:
         return self._by_code[code]
 
@@ -90,7 +93,38 @@ map = Map(strip)
 
 @app.route('/stations/color', methods=['GET', 'POST'])
 def station_colors():
-    pass
+    """
+    POST a dict like this:
+    {
+        "colors": {
+            "KHPN": [100, 200, 153],
+            "KATL": [100, 200, 153],
+        },
+        "show": True
+    }
+
+    GET returns a dict like the above, including all stations.
+    """
+    if flask.request.method == 'POST':
+        data = flask.request.json
+        colors = data["colors"]
+        show = data.get("show", False)
+
+        for code, color in colors.items():
+            station = index.get_station(code)
+            map.set_color(station, (color[0], color[1], color[2]))
+
+        if show:
+            map.show()
+
+        return "OK", 200
+    else:
+        colors = dict()
+        for code in index.get_station_names():
+            station = index.get_station(code)
+            color = strip.get(station.led)
+            colors[code] = color
+        return flask.jsonify(colors)
 
 @app.route('/station/<code>/color', methods=['GET', 'POST'])
 def color(code):
