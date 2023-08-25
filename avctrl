@@ -24,22 +24,13 @@ def set_color(args: argparse.Namespace):
 
 class RandomMode():
     def run(self):
-        for station in cfg["stations"]:
-            code = station["code"]
-            color = [random.randint(0, 255) for _ in range(3)]
-            api.set_color(code, color)
-            print(f"Setting {code} to {color}")
-        api.show()
+        api.set_colors({station["code"]: [random.randint(0, 255) for _ in range(3)] for station in cfg["stations"]}, show=True)
 
 
 class OffMode():
     def run(self):
-        for station in cfg["stations"]:
-            code = station["code"]
-            color = [0, 0, 0]
-            api.set_color(code, color)
-            print(f"Setting {code} to {color}")
-        api.show()
+        colors = {station["code"]: [0, 0, 0] for station in cfg["stations"]}
+        api.set_colors(colors, show=True)
 
 
 MODES = {
@@ -66,8 +57,13 @@ def activate_mode(args: argparse.Namespace):
 
 
 def get_color(args: argparse.Namespace):
-    color = api.get_color(args.station)
-    logger.info(f"{args.station} color is {color}")
+    if args.station:
+        color = api.get_color(args.station)
+        logger.info(f"{args.station} color is {color}")
+    else:
+        colors = api.get_colors()
+        for station, color in colors.items():
+            logger.info(f"{station} color is {color}")
 
 
 def show_config(args: argparse.Namespace):
@@ -90,8 +86,8 @@ def build_color_parser(parser: argparse.ArgumentParser) -> None:
     set_parser.set_defaults(func=set_color)
 
     get_parser = subparsers.add_parser("get", help="get color")
-    get_parser.add_argument("station", metavar="S",
-                            type=str, help="The station")
+    get_parser.add_argument("station", metavar="S", nargs="?",
+                            type=str, help="The station, if omitted, all stations are listed")
     get_parser.set_defaults(func=get_color)
 
 
@@ -99,7 +95,6 @@ def build_config_parser(parser: argparse.ArgumentParser) -> None:
     subparsers = parser.add_subparsers()
     show_parser = subparsers.add_parser("show")
     show_parser.set_defaults(func=show_config)
-
     set_parser = subparsers.add_parser("set")
     set_parser.add_argument("option", help="option")
     set_parser.add_argument("value", help="value")

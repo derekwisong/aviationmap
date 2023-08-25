@@ -57,5 +57,11 @@ class Api:
         result = self._post(f"/station/{station}/color", json={"color": color, "show": show})
         return result.ok
     
+    def set_colors(self, colors: typing.Dict[str, typing.List[int]], show=False):
+        return self._post("/stations/color", json={"colors": colors, "show": show}).ok
+
+    def get_colors(self):
+        return self._get("/stations/color").json()
+
     def show(self):
         return self._post("/show").ok
