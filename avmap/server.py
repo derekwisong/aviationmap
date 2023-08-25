@@ -88,6 +88,10 @@ index = StationIndex.from_config(cfg)
 strip = LightStrip(index.count())
 map = Map(strip)
 
+@app.route('/stations/color', methods=['GET', 'POST'])
+def station_colors():
+    pass
+
 @app.route('/station/<code>/color', methods=['GET', 'POST'])
 def color(code):
     station = index.get_station(code)
