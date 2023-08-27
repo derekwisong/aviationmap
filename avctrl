@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from abc import ABC
 import argparse
 import logging
 import random
@@ -26,18 +27,31 @@ def set_color(args: argparse.Namespace):
         raise SystemExit("Failed to set color")
 
 
-class RandomMode():
+class Mode(ABC):
+    name: str = None
+
+    def run(self):
+        raise NotImplementedError("run() not implemented in base Mode")
+
+
+class RandomMode(Mode):
+    name = "random"
+
     def run(self):
         api.set_colors({station["code"]: [random.randint(0, 255) for _ in range(3)] for station in cfg["stations"]}, show=True)
 
 
-class OffMode():
+class OffMode(Mode):
+    name = "off"
+
     def run(self):
         colors = {station["code"]: [0, 0, 0] for station in cfg["stations"]}
         api.set_colors(colors, show=True)
 
 
-class FlightCategoryMode:
+class FlightCategoryMode(Mode):
+    name = "flight_category"
+
     def get_color(self, data, default=[255, 255, 255]):
         try:
             return flight_category_colors[data["flight_category"]]
@@ -50,11 +64,8 @@ class FlightCategoryMode:
         api.set_colors(colors, show=True)
 
 
-MODES = {
-    "random": RandomMode,
-    "off": OffMode,
-    "category": FlightCategoryMode,
-}
+# MODES is a dict of Mode subclasses in this module keyed by their names
+MODES = {cls.name: cls for cls in globals().values() if isinstance(cls, type) and issubclass(cls, Mode) and cls.name}
 
 
 def mode_factory(name: str):
